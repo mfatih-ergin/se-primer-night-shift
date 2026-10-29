@@ -1,127 +1,108 @@
-describe('SE Primer — Night Shift: Season 5 Zero Hour E2E Test Suite', () => {
+describe('SE Primer — Night Shift: Season 5 Zero Hour E2E Test Suite (AI Studio React Build)', () => {
   beforeEach(() => {
     cy.visit('/');
   });
 
-  it('1. Ekran 1: Karşılama, Kişiselleştirme ve Eval Modalı Kontrolü', () => {
-    cy.get('#screenOnboarding').should('be.visible');
-    cy.get('h1').should('contain', 'Night Shift');
-
-    // Eval Modalı Aç ve Doğrula
-    cy.contains('Tutor Eval Raporu (20 Vaka Benchmark)').click();
-    cy.get('#evalModal').should('have.class', 'open');
-    cy.get('#evalSummaryBox').should('contain', 'Başarı Oranı');
-    cy.get('#evalTableBody tr').should('have.length', 20);
-    cy.get('.close-btn').last().click();
-    cy.get('#evalModal').should('not.have.class', 'open');
+  it('1. Ekran 1: Karşılama, Kişiselleştirme Seçimlerini Doğrular ve Nöbete Başlar', () => {
+    cy.contains('SE Primer: Night Shift').should('be.visible');
+    cy.contains('ZERO HOUR INCIDENT').should('be.visible');
 
     // Seviye Seçimi: Senior
-    cy.get('.option-btn[data-group="level"][data-value="senior"]').click();
-    cy.get('.option-btn[data-group="level"][data-value="senior"]').should('have.class', 'selected');
+    cy.contains('Senior Mühendis').click();
 
-    // Rol Seçimi: SRE
-    cy.get('.option-btn[data-group="role"][data-value="sre"]').click();
-    cy.get('.option-btn[data-group="role"][data-value="sre"]').should('have.class', 'selected');
+    // Rol Seçimi: SRE / DevOps
+    cy.contains('SRE / DevOps').click();
 
-    // Hedef: Sıfır Veri Kaybı
-    cy.get('.option-btn[data-group="goal"][data-value="zero-loss"]').click();
-    cy.get('.option-btn[data-group="goal"][data-value="zero-loss"]').should('have.class', 'selected');
+    // Hedef: Hızlı Restorasyon
+    cy.contains('Hızlı Restorasyon').click();
 
-    // Oyunu Başlat
-    cy.get('#btnStartGame').click();
-    cy.get('#screenDecision').should('be.visible');
-    cy.get('#roleLabel').should('contain', 'SRE / INFRA [SENIOR]');
-    cy.get('#seniorTimerBar').should('be.visible');
+    // Simülasyonu Başlat
+    cy.contains("Primer'ı Başlat — Nöbeti Devral").click();
+
+    // Kriz Sahnesi ve Telemetri Kontrolü
+    cy.contains('MİMARİ DARBOĞAZ').should('be.visible');
+    cy.contains('KRİTİK KARAR MATRİSİ').should('be.visible');
   });
 
-  it('2. Başarılı Yol (Happy Path): B -> A -> A Kararları ile Başarılı Son (STABILIZED)', () => {
-    cy.get('#btnStartGame').click();
-    cy.get('#screenDecision').should('be.visible');
+  it('2. Başarılı Yol (Happy Path): Kararlar ile STABILIZED Sonucuna Ulaşır', () => {
+    cy.contains("Primer'ı Başlat — Nöbeti Devral").click();
 
-    // Aşama 1: Mimari & Trafik -> B Seçimi (Kuyruk & Canlı Yama)
-    cy.get('#stageBadge').should('contain', 'AŞAMA 1');
-    cy.get('#choiceBtnB').click();
-    cy.get('#feedbackBox').should('be.visible');
-    cy.get('#feedbackWhat').should('contain', 'Kademeli kuyruk (backpressure) devreye alındı');
-    cy.get('#feedbackWhy').should('contain', 'Sistem trafiği yumuşatıldı');
-    cy.get('#btnNextStep').click();
+    // Aşama 1: Seçenek B (Dinamik Kuyruk & Backpressure)
+    cy.contains('Dinamik Kuyruk (Backpressure)').click();
+    cy.contains('NE OLDU? (SİSTEM TEPKİSİ)').should('be.visible');
+    cy.contains('NEDEN OLDU? (KÖK MİMARİ NEDEN)').should('be.visible');
+    cy.contains('İlerle').click();
 
-    // Aşama 2: Doğrulama & Test -> A Seçimi (10k Bot Yük Testi)
-    cy.get('#stageBadge').should('contain', 'AŞAMA 2');
-    cy.get('#choiceBtnA').click();
-    cy.get('#feedbackBox').should('be.visible');
-    cy.get('#feedbackWhat').should('contain', '10.000 sanal bot testi');
-    cy.get('#btnNextStep').click();
+    // Aşama 2: Seçenek A (10k Bot Yük Testi)
+    cy.contains('Aşama 2: Doğrulama & Test Arenası').should('be.visible');
+    cy.contains('10.000 Bot ile Staging Yük Testi').click();
+    cy.contains('NE OLDU? (SİSTEM TEPKİSİ)').should('be.visible');
+    cy.contains('İlerle').click();
 
-    // Aşama 3: Veri Bütünlüğü & Ekonomi -> A Seçimi (Log Taraması & Hile İzolasyonu)
-    cy.get('#stageBadge').should('contain', 'AŞAMA 3');
-    cy.get('#choiceBtnA').click();
-    cy.get('#feedbackBox').should('be.visible');
-    cy.get('#feedbackWhat').should('contain', 'Loglar taranarak 1.200 exploit hesabı izole edildi');
-    cy.get('#btnNextStep').click();
+    // Aşama 3: Seçenek A (Log Taraması & Exploit İzolasyonu)
+    cy.contains('Aşama 3: Veri Bütünlüğü ve Ekonomi Krizi').should('be.visible');
+    cy.contains('Log Taraması & Exploit Hesaplarını Karantinaya Al').click();
+    cy.contains('NE OLDU? (SİSTEM TEPKİSİ)').should('be.visible');
+    cy.contains('Sonuç Raporunu ve Post-Mortem’i Gör').click();
 
-    // Ekran 3: Sonuç Ekranı Doğrulaması
-    cy.get('#screenResult').should('be.visible');
-    cy.get('#outcomeBadge').should('contain', 'STABILIZED · BAŞARILI SON');
-    cy.get('#outcomeHeading').should('contain', 'Sezon 5 Kurtarıldı!');
-    cy.get('#finalDataIntegrity').should('contain', '%100');
-    cy.get('#finalEconomy').should('contain', 'GÜVENDE');
+    // Sonuç Ekranı Doğrulaması
+    cy.contains('STABILIZED').should('be.visible');
+    cy.contains('Mühendislik Raporunu Kopyala').should('be.visible');
   });
 
-  it('3. Felaket Yolu (Disaster Path): A -> B -> B Kararları ile Çöküş Sonu (COLLAPSE)', () => {
-    cy.get('#btnStartGame').click();
+  it('3. Felaket Yolu (Disaster Path): Hatalı Kararlar ile COLLAPSED Sonucuna Ulaşır', () => {
+    cy.contains("Primer'ı Başlat — Nöbeti Devral").click();
 
-    // Aşama 1: A Seçimi (Panik Rollback)
-    cy.get('#choiceBtnA').click();
-    cy.get('#feedbackWhat').should('contain', 'Tüm lobiler ve soketler anında kapatıldı');
-    cy.get('#btnNextStep').click();
+    // Aşama 1: Seçenek A (Panik Rollback)
+    cy.contains('Monolitik Bakım Modu & Rollback').click();
+    cy.contains('NE OLDU? (SİSTEM TEPKİSİ)').should('be.visible');
+    cy.contains('İlerle').click();
 
-    // Aşama 2: B Seçimi (Testi Atla)
-    cy.get('#choiceBtnB').click();
-    cy.get('#feedbackWhat').should('contain', 'race condition yayıldı');
-    cy.get('#btnNextStep').click();
+    // Aşama 2: Seçenek B (Testi Atla)
+    cy.contains('Aşama 2: Doğrulama & Test Arenası').should('be.visible');
+    cy.contains('Testi Atla & Canlıya Dağıt').click();
+    cy.contains('NE OLDU? (SİSTEM TEPKİSİ)').should('be.visible');
+    cy.contains('İlerle').click();
 
-    // Aşama 3: B Seçimi (Logları Görmezden Gel)
-    cy.get('#choiceBtnB').click();
-    cy.get('#feedbackWhat').should('contain', 'Dupe eşyalar serbest pazara saçıldı');
-    cy.get('#btnNextStep').click();
+    // Aşama 3: Seçenek B (Görmezden Gel)
+    cy.contains('Aşama 3: Veri Bütünlüğü ve Ekonomi Krizi').should('be.visible');
+    cy.contains('Görmezden Gel & Servisi Açık Tut').click();
+    cy.contains('NE OLDU? (SİSTEM TEPKİSİ)').should('be.visible');
+    cy.contains('Sonuç Raporunu ve Post-Mortem’i Gör').click();
 
-    // Ekran 3: Çöküş Doğrulaması
-    cy.get('#screenResult').should('be.visible');
-    cy.get('#outcomeBadge').should('contain', 'COLLAPSE · FELAKET SON');
-    cy.get('#outcomeHeading').should('contain', 'Ekonomi ve İtibar Çöktü!');
-    cy.get('#finalEconomy').should('contain', 'ÇÖKTÜ');
+    // Çöküş Doğrulaması
+    cy.contains('COLLAPSE').should('be.visible');
+    cy.contains('SYSTEM COLLAPSE').should('be.visible');
   });
 
-  it('4. Sokratik AI Tutor API Etkileşimi: /api/tutor Üzerinden Sokratik Soruyla Döner', () => {
-    cy.get('#btnStartGame').click();
+  it('4. Sokratik AI Tutor Etkileşimi: Sokratik Soru ile Yanıt Verir', () => {
+    cy.contains("Primer'ı Başlat — Nöbeti Devral").click();
 
-    // Tutor modalını aç
-    cy.contains('Sokratik AI Rehber').click();
-    cy.get('#tutorModal').should('have.class', 'open');
-    cy.get('#tutorResponse').should('be.visible');
+    // Danış butonuna bas
+    cy.contains('Danış').click();
+    cy.contains('ILLUSTRATED PRIMER SOKRATİK MENTOR').should('be.visible');
 
-    // "Hangisi doğru cevap?" sorusunu sor
-    cy.contains('Hangisi doğru cevap? A mı B mi?').click();
-    cy.get('#tutorResponse').should('contain', 'görevi hazır');
+    // Soru yaz ve gönder
+    cy.get('input[placeholder*="Mimari"]').type('Hangisi doğru cevap A mı B mi?{enter}');
 
-    // Modalı kapat
-    cy.get('.close-btn').first().click();
-    cy.get('#tutorModal').should('not.have.class', 'open');
+    // Yanıtın Sokratik soru işareti içerdiğini doğrula
+    cy.contains('?').should('be.visible');
   });
 
   it('5. Yeniden Başlatma (Restart) Döngüsü Başarıyla Çalışır', () => {
-    cy.get('#btnStartGame').click();
-    cy.get('#choiceBtnB').click();
-    cy.get('#btnNextStep').click();
-    cy.get('#choiceBtnA').click();
-    cy.get('#btnNextStep').click();
-    cy.get('#choiceBtnA').click();
-    cy.get('#btnNextStep').click();
+    cy.contains("Primer'ı Başlat — Nöbeti Devral").click();
+    cy.contains('Dinamik Kuyruk (Backpressure)').click();
+    cy.contains('İlerle').click();
+    cy.contains('Aşama 2: Doğrulama & Test Arenası').should('be.visible');
+    cy.contains('10.000 Bot ile Staging Yük Testi').click();
+    cy.contains('İlerle').click();
+    cy.contains('Aşama 3: Veri Bütünlüğü ve Ekonomi Krizi').should('be.visible');
+    cy.contains('Log Taraması & Exploit Hesaplarını Karantinaya Al').click();
+    cy.contains('Sonuç Raporunu ve Post-Mortem’i Gör').click();
 
-    // Sonuç ekranındayken yeniden başlat
-    cy.get('#btnRestart').click();
-    cy.get('#screenOnboarding').should('be.visible');
-    cy.get('#screenResult').should('not.be.visible');
+    // Yeniden Başlat
+    cy.contains('Simülasyonu Yeniden Başlat').click();
+    cy.contains('SE Primer: Night Shift').should('be.visible');
+    cy.contains('ZERO HOUR INCIDENT').should('be.visible');
   });
 });

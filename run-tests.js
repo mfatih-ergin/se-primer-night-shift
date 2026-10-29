@@ -1,8 +1,12 @@
-const { spawn } = require('child_process');
-const http = require('http');
+import { spawn } from 'child_process';
+import http from 'http';
 
-console.log('1. Starting local HTTP server...');
-const serverProcess = spawn('node', ['server.js'], { stdio: 'inherit' });
+console.log('1. Starting AI Studio Express server (tsx server.ts)...');
+const serverProcess = spawn('npx.cmd', ['tsx', 'server.ts'], { 
+  stdio: 'inherit', 
+  shell: true,
+  env: { ...process.env, PORT: '3000' }
+});
 
 function waitForServer(callback, attempts = 0) {
   if (attempts > 30) {
