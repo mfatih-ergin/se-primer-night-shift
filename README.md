@@ -11,7 +11,7 @@
 - **Öğrenci No:** 241478059
 - **E-Posta:** f.ergin162@gmail.com
 - **GitHub Profili:** [github.com/kullanici-adi]
-- **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/53b467d0-5b03-410a-b39c-f85bad7a3fa9?fullscreenApplet=true](https://ai.studio/apps/53b467d0-5b03-410a-b39c-f85bad7a3fa9?fullscreenApplet=true)
+- **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true](https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true)
 - **Cypress Demo Video:** `cypress/videos/simulator.cy.js.mp4`
 
 ---
