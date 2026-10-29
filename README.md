@@ -1,16 +1,18 @@
 # SE Primer — Night Shift: Season 5 Zero Hour
+
 > **YZM301 - Yazılım Gerçekleme ve Test Dersi**  
-> Neal Stephenson'ın *The Diamond Age* eserindeki *"A Young Lady's Illustrated Primer"* konseptinden esinlenen, kişiselleştirilmiş interaktif yazılım mühendisliği kriz simülatörü.
+> Neal Stephenson'ın _The Diamond Age_ eserindeki _"A Young Lady's Illustrated Primer"_ konseptinden esinlenen, kişiselleştirilmiş interaktif yazılım mühendisliği kriz simülatörü.
 
 ---
 
 ## 📌 Proje Künyesi ve Öğrenci Bilgileri
-* **Adı Soyadı:** Fatih ERGİN
-* **Öğrenci No:** [Öğrenci Numaranız]
-* **E-Posta:** f.ergin162@gmail.com
-* **GitHub Profili:** [github.com/kullanici-adi]
-* **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/f9074fcd-e60d-4c94-b0b4-588efecfd793?fullscreenApplet=true](https://ai.studio/apps/f9074fcd-e60d-4c94-b0b4-588efecfd793?fullscreenApplet=true)
-* **Cypress Demo Video:** `cypress/videos/simulator.cy.js.mp4`
+
+- **Adı Soyadı:** Fatih ERGİN
+- **Öğrenci No:** 241478059
+- **E-Posta:** f.ergin162@gmail.com
+- **GitHub Profili:** [github.com/kullanici-adi]
+- **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/53b467d0-5b03-410a-b39c-f85bad7a3fa9?fullscreenApplet=true](https://ai.studio/apps/53b467d0-5b03-410a-b39c-f85bad7a3fa9?fullscreenApplet=true)
+- **Cypress Demo Video:** `cypress/videos/simulator.cy.js.mp4`
 
 ---
 
@@ -19,34 +21,36 @@
 Bu projede ödev yönergesinde belirtilen tüm araç zinciri eksiksiz uygulanmış ve repoda kanıtlanmıştır:
 
 1. **Google Stitch (`stitch.withgoogle.com`):**
-   * Kullanılan tasarım promptları [`docs/stitch-prompts.md`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/docs/stitch-prompts.md) dosyasında belgelenmiştir.
-   * Üretilen 3 ana mobil ekranın Stitch HTML prototipleri [`design/`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/design) klasöründedir (`giris.html`, `sahne.html`, `son.html`).
+   - Kullanılan tasarım promptları [`docs/stitch-prompts.md`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/docs/stitch-prompts.md) dosyasında belgelenmiştir.
+   - Üretilen 3 ana mobil ekranın Stitch HTML prototipleri [`design/`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/design) klasöründedir (`giris.html`, `sahne.html`, `son.html`).
 2. **Google AI Studio (`aistudio.google.com`):**
-   * AI Studio'ya *"Build with Google AI Studio"* denildiğinde verilen sistem geliştirme istemi [`docs/aistudio-prompt.md`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/docs/aistudio-prompt.md) dosyasında yer almaktadır.
-   * AI Studio standart proje tanımlayıcısı [`metadata.json`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/metadata.json) eklenmiştir (`"majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]`).
+   - AI Studio'ya _"Build with Google AI Studio"_ denildiğinde verilen sistem geliştirme istemi [`docs/aistudio-prompt.md`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/docs/aistudio-prompt.md) dosyasında yer almaktadır.
+   - AI Studio standart proje tanımlayıcısı [`metadata.json`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/metadata.json) eklenmiştir (`"majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]`).
 3. **Sunucu Tarafı Gemini API & Sokratik Guardrail Motoru:**
-   * [`server.js`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/server.js) içinde `/api/tutor` uç noktası kurulmuştur. `process.env.GEMINI_API_KEY` tanımlandığında canlı Google Gemini modelini çağırır; anahtar girilmediğinde deterministik Sokratik koruma motoru çalışır.
-   * `enforceSocraticGuardrails` fonksiyonu ile modelin doğrudan şık ele vermesi engellenir (E1/E2 kuralı) ve her yanıtın düşündürücü soru işaretiyle (`?`) bitmesi zorunlu kılınır (E3 kuralı).
+   - [`server.js`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/server.js) içinde `/api/tutor` uç noktası kurulmuştur. `process.env.GEMINI_API_KEY` tanımlandığında canlı Google Gemini modelini çağırır; anahtar girilmediğinde deterministik Sokratik koruma motoru çalışır.
+   - `enforceSocraticGuardrails` fonksiyonu ile modelin doğrudan şık ele vermesi engellenir (E1/E2 kuralı) ve her yanıtın düşündürücü soru işaretiyle (`?`) bitmesi zorunlu kılınır (E3 kuralı).
 4. **Uygulama İçi Canlı Eval Modalı:**
-   * Arayüzdeki *"Tutor Eval Raporu (20 Vaka Benchmark)"* butonu ile `/api/eval/run` API'si çağrılır ve 20 öğrenci isteminin canlı test sonuçları anlık olarak tabloda sunulur.
+   - Arayüzdeki _"Tutor Eval Raporu (20 Vaka Benchmark)"_ butonu ile `/api/eval/run` API'si çağrılır ve 20 öğrenci isteminin canlı test sonuçları anlık olarak tabloda sunulur.
 
 ---
 
 ## 🎯 Ürün Kararları: Yapılmayan 3 Özellik ve Gerekçeleri (10 Puan)
+
 Mühendisliğin en kritik darboğazı "neyi yapacağın kadar neyi yapmayacağına karar vermektir" ilkesi doğrultusunda bilinçli olarak kapsam dışı bırakılan 3 özellik:
 
 1. **Kullanıcı Kaydı, Giriş ve Oturum Yönetimi (Authentication / Login) Yapılmadı:**  
-   *Gerekçe:* Bir kriz simülasyonunda kullanıcının anlık refleksini ve müdahale hızını yavaşlatmamak, sürtünmeyi (friction) sıfıra indirmek ve odağı tamamen durum geçişlerine vermek amacıyla oturum açma kapsam dışı bırakıldı.
+   _Gerekçe:_ Bir kriz simülasyonunda kullanıcının anlık refleksini ve müdahale hızını yavaşlatmamak, sürtünmeyi (friction) sıfıra indirmek ve odağı tamamen durum geçişlerine vermek amacıyla oturum açma kapsam dışı bırakıldı.
 
 2. **2. Bölüm veya Çoklu Harici Senaryo Dalları Yapılmadı:**  
-   *Gerekçe:* Yüzeyde çok sayıda yüzeysel senaryo üretmek yerine, tek bir dağıtık sistem krizinde mimari (rollback vs. kuyruk), doğrulama (yük testi) ve veri bütünlüğü (dupe exploit izolasyonu) kararlarının derinlemesine öğrenilmesini sağlamak hedeflendi.
+   _Gerekçe:_ Yüzeyde çok sayıda yüzeysel senaryo üretmek yerine, tek bir dağıtık sistem krizinde mimari (rollback vs. kuyruk), doğrulama (yük testi) ve veri bütünlüğü (dupe exploit izolasyonu) kararlarının derinlemesine öğrenilmesini sağlamak hedeflendi.
 
 3. **Native Mobil Uygulama (Flutter / React Native Derlemesi) Yapılmadı:**  
-   *Gerekçe:* Google AI Studio ve mobil web tarayıcıları üzerinde işletim sistemi bağımsız, ek kurulum gerektirmeyen ve tek tıkla telefonda çalışan responsive bir web arayüzü sunulması tercih edildi.
+   _Gerekçe:_ Google AI Studio ve mobil web tarayıcıları üzerinde işletim sistemi bağımsız, ek kurulum gerektirmeyen ve tek tıkla telefonda çalışan responsive bir web arayüzü sunulması tercih edildi.
 
 ---
 
 ## 📁 Proje Dizin Yapısı
+
 ```text
 ├── metadata.json         # Google AI Studio uygulama metaverisi (Server-side Gemini API)
 ├── docs/                 # Sistem İstemleri ve Prompt Dokümantasyonu
