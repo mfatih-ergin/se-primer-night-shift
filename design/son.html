@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Stitch — Ekran 3: Post-Mortem ve Sonuç Raporu</title>
+  <style>
+    body { background: #0B0F19; color: #F9FAFB; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+    .container { width: 340px; text-align: center; }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid #10B981; padding: 6px 12px; border-radius: 99px; font-weight: bold; font-size: 11px; }
+    .telemetry { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 10px; font-family: monospace; font-size: 12px; margin: 16px 0; text-align: left; }
+    .card { background: #151D2F; border: 1px solid #24324F; border-radius: 14px; padding: 14px; text-align: left; font-size: 13px; color: #94A3B8; margin-bottom: 12px; }
+    .btn { background: #3B82F6; color: white; padding: 12px; border: none; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="badge-success">STABILIZED · BAŞARILI SON</span>
+    <h2 style="margin: 10px 0 4px 0;">21:45 — Sezon 5 Kurtarıldı!</h2>
+    <p style="font-size:12px; color:#94A3B8;">Mühendislik kararların oyun altyapısını kurtardı.</p>
+    <div class="telemetry">
+      <div>Kararlılık: <span style="color:#10B981;">%94</span></div>
+      <div>Veri: <span style="color:#10B981;">%100</span></div>
+      <div>Ekonomi: <span style="color:#10B981;">GÜVENDE</span></div>
+      <div>Skor: <span style="color:#10B981;">90 / 100</span></div>
+    </div>
+    <div class="card">
+      <strong style="color:white;">Post-Mortem Özeti:</strong><br>
+      Kriz anında monolitik rollback yerine kademeli kuyruk uygulandı, staging bot testleriyle mutex açığı yakalandı ve exploit hesapları donduruldu.
+    </div>
+    <button class="btn">🔄 Simülasyonu Yeniden Başlat</button>
+  </div>
+</body>
+</html>

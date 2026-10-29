@@ -9,8 +9,26 @@
 * **Öğrenci No:** [Öğrenci Numarası]
 * **E-Posta:** [ogrenci@universite.edu.tr]
 * **GitHub Profili:** [github.com/kullanici-adi]
-* **Canlı AI Studio / Web Uygulaması:** `http://localhost:3000` (veya Google AI Studio paylaşılan test bağlantısı)
+* **Google AI Studio / Canlı Uygulama Linki:** `http://localhost:3000` (veya AI Studio paylaşılan Web App URL'i)
 * **Cypress Demo Video:** `cypress/videos/simulator.cy.js.mp4`
+
+---
+
+## 🛠️ Google Araç Zinciri ve Mimari Kanıtları (Stitch & AI Studio)
+
+Bu projede ödev yönergesinde belirtilen tüm araç zinciri eksiksiz uygulanmış ve repoda kanıtlanmıştır:
+
+1. **Google Stitch (`stitch.withgoogle.com`):**
+   * Kullanılan tasarım promptları [`docs/stitch-prompts.md`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/docs/stitch-prompts.md) dosyasında belgelenmiştir.
+   * Üretilen 3 ana mobil ekranın Stitch HTML prototipleri [`design/`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/design) klasöründedir (`giris.html`, `sahne.html`, `son.html`).
+2. **Google AI Studio (`aistudio.google.com`):**
+   * AI Studio'ya *"Build with Google AI Studio"* denildiğinde verilen sistem geliştirme istemi [`docs/aistudio-prompt.md`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/docs/aistudio-prompt.md) dosyasında yer almaktadır.
+   * AI Studio standart proje tanımlayıcısı [`metadata.json`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/metadata.json) eklenmiştir (`"majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]`).
+3. **Sunucu Tarafı Gemini API & Sokratik Guardrail Motoru:**
+   * [`server.js`](file:///c:/Users/Pc/OneDrive/Desktop/Yazılım Gerçekleme ve Test/Yazılım Gerçekleme ve Test Ödev 6/server.js) içinde `/api/tutor` uç noktası kurulmuştur. `process.env.GEMINI_API_KEY` tanımlandığında canlı Google Gemini modelini çağırır; anahtar girilmediğinde deterministik Sokratik koruma motoru çalışır.
+   * `enforceSocraticGuardrails` fonksiyonu ile modelin doğrudan şık ele vermesi engellenir (E1/E2 kuralı) ve her yanıtın düşündürücü soru işaretiyle (`?`) bitmesi zorunlu kılınır (E3 kuralı).
+4. **Uygulama İçi Canlı Eval Modalı:**
+   * Arayüzdeki *"Tutor Eval Raporu (20 Vaka Benchmark)"* butonu ile `/api/eval/run` API'si çağrılır ve 20 öğrenci isteminin canlı test sonuçları anlık olarak tabloda sunulur.
 
 ---
 
@@ -28,51 +46,44 @@ Mühendisliğin en kritik darboğazı "neyi yapacağın kadar neyi yapmayacağı
 
 ---
 
-## 🛠️ Senaryo ve Mekanik Özeti
-* **Kriz:** 21:00'da Sezon 5 açılışında 250.000 eşzamanlı oyuncunun yükü altında WebSocket ağ geçitlerinin çökmesi ve veritabanı deadlock fırtınası.
-* **Kişiselleştirme:** 
-  * *Junior Seviye:* Kavramsal ipuçları ve yönlendirici Sokratik diyaloglar aktif.
-  * *Senior Seviye:* 60 saniyelik görsel kriz sayacı baskısı altında karar verme zorunluluğu.
-* **3 Teknik Karar:**
-  1. *Mimari:* Tam Kapatma & Rollback vs. Dinamik Kuyruk (Backpressure) & Canlı Hotfix.
-  2. *Test & Doğrulama:* 10.000 Bot ile Staging Yük Testi vs. Doğrudan Canlıya Sürüş.
-  3. *Veri Bütünlüğü:* Log Taraması & Exploit Hesaplarını Dondurma vs. Görmezden Gelme.
-* **2 Bitiş:** `STABILIZED` (Başarılı Son) ve `COLLAPSE` (Ekonomi Çöküşü / Kötü Son).
-* **Sokratik AI Tutor:** Kullanıcıya cevabı asla vermeyen; arka plandaki finansal mutabakat, thread-safety ve race condition risklerini sorgulatan yapay zekâ danışman.
-
----
-
 ## 📁 Proje Dizin Yapısı
 ```text
-├── spec.md               # 1. Adım: Problem, kapsam, 5 kabul kriteri, Mermaid akış şeması (20 Puan)
-├── DESIGN.md             # 2. Adım: 3 mobil ekran tasarım rehberi, tokens, UX mimarisi (15 Puan)
-├── index.html            # 3. Adım: Çalışan, responsive mobil web uygulaması (20 Puan)
-├── eval.md               # 4. Adım: 20 öğrenci istemi, hata taksonomisi, elle etiketleme (25 Puan)
-├── cypress/              # 5. Adım: Tüm yolları gezen E2E test paketi (10 Puan)
+├── metadata.json         # Google AI Studio uygulama metaverisi (Server-side Gemini API)
+├── docs/                 # Sistem İstemleri ve Prompt Dokümantasyonu
+│   ├── stitch-prompts.md # Google Stitch 3 ekran tasarım promptları
+│   └── aistudio-prompt.md# Google AI Studio tam sistem istemi
+├── design/               # Google Stitch prototip ekran çıktıları
+│   ├── giris.html
+│   ├── sahne.html
+│   └── son.html
+├── spec.md               # 1. Adım: Problem, kapsam, 5 kabul kriteri, Mermaid şeması (20 Puan)
+├── DESIGN.md             # 2. Adım: Tasarım sistemi, renkler, tipografi ve UX mimarisi (15 Puan)
+├── index.html            # 3. Adım: Canlı mobil simülatör + Sokratik AI Tutor + Eval Modalı (20 Puan)
+├── eval.md               # 4. Adım: 20 vaka, hata taksonomisi ve elle etiketleme raporu (25 Puan)
+├── cypress/              # 5. Adım: E2E testleri ve otomatik video kaydı (10 Puan)
 │   ├── e2e/simulator.cy.js
-│   └── videos/           # 60 sn otomatik demo test kaydı
-├── server.js             # Sıfır bağımlılıklı Node.js statik sunucu
-├── package.json          # Test ve başlatma betikleri
-└── README.md             # 6. Adım: Ürün kararları, künye ve dokümantasyon (10 Puan)
+│   └── videos/simulator.cy.js.mp4
+├── server.js             # Express/Node HTTP sunucusu, /api/tutor ve /api/eval/run API'leri
+├── run-tests.js          # Otomatik sunucu başlatıcı ve Cypress video kaydedici
+├── package.json          # Betikler ve bağımlılıklar
+└── README.md             # 6. Adım: Ürün kararları, mimari ve künye (10 Puan)
 ```
 
 ---
 
 ## 🚀 Yerel Kurulum ve Test Koşusu
 
-### 1. Uygulamayı Başlatma
 ```bash
-# Bağımlılıkları yükleyin (Cypress için)
+# Bağımlılıkları yükleyin
 npm install
 
-# Yerel sunucuyu ayağa kaldırın
-npm start
-# Uygulama http://localhost:3000 adresinde çalışacaktır.
-```
+# İsteğe bağlı: Canlı Gemini API anahtarınızı tanımlayın
+# set GEMINI_API_KEY=your_api_key
 
-### 2. Cypress E2E Testlerini Koşma ve Video Kaydı Alma
-```bash
-# Başlıksız (Headless) modda tüm testleri koşturun ve video kaydını oluşturun:
+# Sunucuyu başlatın
+npm start
+# Uygulama http://localhost:3000 adresinde açılacaktır.
+
+# Cypress E2E testlerini koşun ve videoyu oluşturun
 npm run cypress:run
 ```
-Test tamamlandığında `cypress/videos/simulator.cy.js.mp4` konumunda otomatik 60 saniyelik demo videosu oluşacaktır.

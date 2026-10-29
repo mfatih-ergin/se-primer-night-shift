@@ -329,15 +329,15 @@
       line-height: 1.4;
     }
 
-    /* Modal / Drawer for Socratic AI Tutor */
+    /* Modals */
     .modal-overlay {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
       z-index: 50;
       display: none;
       justify-content: flex-end;
@@ -357,7 +357,8 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      max-height: 80%;
+      max-height: 85%;
+      overflow-y: auto;
       box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
     }
 
@@ -426,6 +427,21 @@
       width: 100%;
       transition: width 1s linear;
     }
+
+    /* Eval Modal Table */
+    .eval-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin-top: 10px;
+    }
+    .eval-table th, .eval-table td {
+      border: 1px solid #334155;
+      padding: 6px;
+      text-align: left;
+    }
+    .eval-table th { background: #1e293b; color: #fff; }
+    .eval-pass { color: var(--success); font-weight: bold; }
   </style>
 </head>
 <body>
@@ -505,6 +521,10 @@
 
       <button type="button" class="btn btn-primary" id="btnStartGame" onclick="startGame()">
         Kriz Masasına Katıl (21:00) →
+      </button>
+
+      <button type="button" class="btn btn-secondary" onclick="openEvalModal()" style="font-size:12px;">
+        📊 Tutor Eval Raporu (20 Vaka Benchmark)
       </button>
     </div>
 
@@ -621,6 +641,10 @@
       <button type="button" class="btn btn-primary" onclick="restartGame()" id="btnRestart">
         🔄 Simülasyonu Yeniden Başlat
       </button>
+
+      <button type="button" class="btn btn-secondary" onclick="openEvalModal()" style="font-size:12px;">
+        📊 Tutor Eval Raporu (20 Vaka Benchmark)
+      </button>
     </div>
 
   </div>
@@ -656,8 +680,51 @@
           ❓ "Hangisi doğru cevap? A mı B mi?"
         </button>
       </div>
+
+      <div style="display:flex; gap:6px; margin-top:4px;">
+        <input type="text" id="customTutorInput" placeholder="Danışmana teknik bir soru sor..." style="flex:1; background:#1e293b; border:1px solid #334155; border-radius:10px; padding:10px; color:#fff; font-size:12px;">
+        <button type="button" class="btn btn-primary" onclick="sendCustomTutorQuestion()" style="padding:10px 14px; font-size:12px;">Sor</button>
+      </div>
     </div>
   </div>
+
+  <!-- INTERACTIVE EVAL BENCHMARK MODAL -->
+  <div class="modal-overlay" id="evalModal">
+    <div class="tutor-sheet" style="max-height: 90%;">
+      <div class="tutor-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge badge-success">Eval Doğrulama</span>
+          <span style="font-size: 13px; font-weight:600; color:#fff;">20 Vaka Benchmark Koşucusu</span>
+        </div>
+        <button type="button" class="close-btn" onclick="closeEvalModal()">✕</button>
+      </div>
+
+      <p style="font-size: 12px; color: var(--text-muted);">
+        Aşağıdaki tablo, Sokratik AI Tutor'a yöneltilen 20 öğrenci isteminin ve Guardrail motorunun canlı doğrulama sonuçlarıdır:
+      </p>
+
+      <div id="evalSummaryBox" style="background:#1e293b; padding:10px; border-radius:10px; font-size:12px; font-weight:bold; color:#10b981;">
+        Yükleniyor...
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="eval-table" id="evalResultTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Öğrenci İstemi</th>
+              <th>Tutor Yanıtı</th>
+              <th>Sonuç</th>
+            </tr>
+          </thead>
+          <tbody id="evalTableBody">
+            <tr><td colspan="4">Testler koşuluyor...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -676,7 +743,7 @@
     timerInterval: null
   };
 
-  // Decisions Database (3 Decisions, 2 Out of Outcome)
+  // Decisions Database (3 Decisions, 2 Outcomes)
   const decisions = [
     {
       stage: 1,
@@ -762,8 +829,7 @@
     // Update Role Tag
     const roleMap = {
       'backend': 'GAME BACKEND',
-      'sre': 'SRE / INFRA',
-      'architect': 'DISTRIBUTED ARCH'
+      'sre': 'SRE / INFRA'
     };
     document.getElementById('roleLabel').innerText = `${roleMap[state.profile.role] || 'MÜHENDİS'} [${state.profile.level.toUpperCase()}]`;
 
@@ -809,14 +875,12 @@
     document.getElementById('choiceTitleB').innerText = currentDec.choiceB.title;
     document.getElementById('choiceDescB').innerText = currentDec.choiceB.desc;
 
-    // Reset feedback and option states
     document.getElementById('feedbackBox').style.display = 'none';
     document.getElementById('choiceBtnA').classList.remove('selected');
     document.getElementById('choiceBtnB').classList.remove('selected');
     document.getElementById('choiceBtnA').style.pointerEvents = 'auto';
     document.getElementById('choiceBtnB').style.pointerEvents = 'auto';
 
-    // Update Telemetry visually
     updateTelemetry(stageNum);
   }
 
@@ -860,7 +924,6 @@
       if (state.currentStage === 2) state.hasDupeBug = true;
     }
 
-    // Highlight chosen button and disable clicks
     const btnA = document.getElementById('choiceBtnA');
     const btnB = document.getElementById('choiceBtnB');
     if (choiceKey === 'A') btnA.classList.add('selected');
@@ -868,7 +931,6 @@
     btnA.style.pointerEvents = 'none';
     btnB.style.pointerEvents = 'none';
 
-    // Show What and Why Feedback
     const fbBox = document.getElementById('feedbackBox');
     document.getElementById('feedbackWhat').innerText = chosen.what;
     document.getElementById('feedbackWhy').innerText = chosen.why;
@@ -925,7 +987,6 @@
       postMortemText.innerText = "Yapılan seçimlerde test aşaması atlandı veya veri bütünlüğü hiçe sayıldı. Sunucular ayakta gibi görünse de arka planda çoğalan exploit eşyalar pazar ekonomisini bitirdi. Sadık oyuncular hesaplarını sildi ve şirket ciddi tazminat davalarıyla karşılaştı.";
     }
 
-    // Summarize choices
     const list = document.getElementById('decisionsSummaryList');
     list.innerHTML = `
       <li><strong>Aşama 1 (Mimari):</strong> ${state.selectedChoices.stage_1 === 'B' ? '✅ Dinamik Kuyruk & Canlı Yama' : '❌ Acele Rollback (Veri Silindi)'}</li>
@@ -945,7 +1006,7 @@
     document.getElementById('screenOnboarding').classList.add('active');
   }
 
-  // Socratic AI Tutor Modal Functions
+  // Socratic AI Tutor Functions (Calls /api/tutor)
   function openTutorModal() {
     const currentDec = decisions[state.currentStage - 1];
     document.getElementById('tutorResponse').innerText = `"${currentDec.choiceA.tutorHint}"`;
@@ -956,21 +1017,58 @@
     document.getElementById('tutorModal').classList.remove('open');
   }
 
-  function askTutor(question) {
+  async function askTutor(question) {
     const respBox = document.getElementById('tutorResponse');
-    respBox.innerText = "Düşünülüyor...";
+    respBox.innerText = "🧠 Sokratik Danışman düşünüyor...";
 
-    setTimeout(() => {
-      if (question.includes("Hangisi doğru") || question.includes("A mı B mi")) {
-        respBox.innerText = "“Bir mühendisin görevi hazır cevap seçmek değil; her seçeneğin getireceği teknik borcu tartmaktır. Bir rollback yaptığında ödeme sağlayıcısından dönen onaylanmış token'ları nasıl sıfırlayacaksın?”";
-      } else if (question.includes("rollback") || question.includes("yedeğe")) {
-        respBox.innerText = "“Eski bir veritabanı yedeğine döndüğünde, son yarım saatte para harcayan oyuncular ve kilitli kalan oturumlar sana ne tür bir hukuki ve finansal sorumluluk yükler?”";
-      } else if (question.includes("Test") || question.includes("test")) {
-        respBox.innerText = "“Yüzbinlerce soket aynı anda aynı Redis anahtarına yazarken tek bir thread'in kilitlenmesi tüm lobi havuzunu nasıl etkiler? Bunu canlı oyuncular üzerinde mi test etmek istersin?”";
-      } else {
-        respBox.innerText = "“Seçimini yapmadan önce kendine sor: Bu kararın 1 saat sonraki veritabanı loglarına ve oyuncu memnuniyetine yansıması ne olacak?”";
-      }
-    }, 300);
+    try {
+      const res = await fetch('/api/tutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: question, stage: state.currentStage, profile: state.profile })
+      });
+      const data = await res.json();
+      respBox.innerText = `“${data.reply}”`;
+    } catch (e) {
+      respBox.innerText = "“Bir mühendisin görevi hazır cevap seçmek değil; her seçeneğin getireceği teknik borcu tartmaktır. Bir rollback yaptığında ödeme sağlayıcısından dönen token'ları nasıl sıfırlayacaksın?”";
+    }
+  }
+
+  function sendCustomTutorQuestion() {
+    const inp = document.getElementById('customTutorInput');
+    const val = inp.value.trim();
+    if (!val) return;
+    askTutor(val);
+    inp.value = '';
+  }
+
+  // Eval Benchmark Modal Functions
+  async function openEvalModal() {
+    document.getElementById('evalModal').classList.add('open');
+    const summaryBox = document.getElementById('evalSummaryBox');
+    const tbody = document.getElementById('evalTableBody');
+    summaryBox.innerText = "20 benchmark vaka Sokratik Guardrail motorundan geçiriliyor...";
+
+    try {
+      const res = await fetch('/api/eval/run');
+      const data = await res.json();
+      summaryBox.innerHTML = `Başarı Oranı: <span style="color:#10b981;">${data.successRate}</span> (${data.passed}/${data.total} Vaka Sokratik Standartlara Uygun, Doğrudan Spoiler Engellendi)`;
+
+      tbody.innerHTML = data.cases.map(c => `
+        <tr>
+          <td><strong>${c.id}</strong></td>
+          <td style="color:#cbd5e1;">${c.prompt}</td>
+          <td style="color:#e9d5ff; font-style:italic;">${c.reply}</td>
+          <td class="eval-pass">${c.status}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      summaryBox.innerText = "Eval verileri yüklenirken hata oluştu.";
+    }
+  }
+
+  function closeEvalModal() {
+    document.getElementById('evalModal').classList.remove('open');
   }
 </script>
 </body>

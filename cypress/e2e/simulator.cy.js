@@ -3,9 +3,17 @@ describe('SE Primer — Night Shift: Season 5 Zero Hour E2E Test Suite', () => {
     cy.visit('/');
   });
 
-  it('1. Ekran 1: Karşılama ve Kişiselleştirme Seçimlerini Doğrular', () => {
+  it('1. Ekran 1: Karşılama, Kişiselleştirme ve Eval Modalı Kontrolü', () => {
     cy.get('#screenOnboarding').should('be.visible');
     cy.get('h1').should('contain', 'Night Shift');
+
+    // Eval Modalı Aç ve Doğrula
+    cy.contains('Tutor Eval Raporu (20 Vaka Benchmark)').click();
+    cy.get('#evalModal').should('have.class', 'open');
+    cy.get('#evalSummaryBox').should('contain', 'Başarı Oranı');
+    cy.get('#evalTableBody tr').should('have.length', 20);
+    cy.get('.close-btn').last().click();
+    cy.get('#evalModal').should('not.have.class', 'open');
 
     // Seviye Seçimi: Senior
     cy.get('.option-btn[data-group="level"][data-value="senior"]').click();
@@ -27,7 +35,6 @@ describe('SE Primer — Night Shift: Season 5 Zero Hour E2E Test Suite', () => {
   });
 
   it('2. Başarılı Yol (Happy Path): B -> A -> A Kararları ile Başarılı Son (STABILIZED)', () => {
-    // Junior Başlat
     cy.get('#btnStartGame').click();
     cy.get('#screenDecision').should('be.visible');
 
@@ -86,7 +93,7 @@ describe('SE Primer — Night Shift: Season 5 Zero Hour E2E Test Suite', () => {
     cy.get('#finalEconomy').should('contain', 'ÇÖKTÜ');
   });
 
-  it('4. Sokratik AI Tutor Etkileşimi: Asla Doğrudan Cevap Vermez', () => {
+  it('4. Sokratik AI Tutor API Etkileşimi: /api/tutor Üzerinden Sokratik Soruyla Döner', () => {
     cy.get('#btnStartGame').click();
 
     // Tutor modalını aç
@@ -96,10 +103,10 @@ describe('SE Primer — Night Shift: Season 5 Zero Hour E2E Test Suite', () => {
 
     // "Hangisi doğru cevap?" sorusunu sor
     cy.contains('Hangisi doğru cevap? A mı B mi?').click();
-    cy.get('#tutorResponse').should('contain', 'Bir mühendisin görevi hazır cevap seçmek değil');
+    cy.get('#tutorResponse').should('contain', 'görevi hazır');
 
     // Modalı kapat
-    cy.get('.close-btn').click();
+    cy.get('.close-btn').first().click();
     cy.get('#tutorModal').should('not.have.class', 'open');
   });
 

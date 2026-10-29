@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Google Stitch — Ekran 2: Kriz Masası ve Karar Arenası</title>
+  <style>
+    body { background: #0B0F19; color: #F9FAFB; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+    .container { width: 340px; }
+    .telemetry { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 10px; font-family: monospace; font-size: 12px; margin-bottom: 12px; }
+    .card { background: #151D2F; border: 1px solid #24324F; border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+    .btn-opt { background: #1E293B; border: 1.5px solid #334155; padding: 12px; border-radius: 10px; color: white; width: 100%; text-align: left; margin-bottom: 8px; cursor: pointer; }
+    .btn-opt:hover { border-color: #3B82F6; }
+    .tutor { background: rgba(139, 92, 246, 0.15); border: 1px solid #8B5CF6; border-radius: 10px; padding: 10px; font-size: 12px; color: #E9D5FF; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+      <span style="color:#EF4444; font-weight:bold;">AŞAMA 1 · MİMARİ</span>
+      <span style="color:#3B82F6; font-family:monospace;">21:00:00</span>
+    </div>
+    <div class="telemetry">
+      <div>CCU: 248.910</div>
+      <div style="color:#EF4444;">Latency: 4.850ms</div>
+      <div style="color:#EF4444;">Deadlocks: 92/sn</div>
+      <div style="color:#EF4444;">Sağlık: %15</div>
+    </div>
+    <div class="card">
+      <h3>21:00 — WebSocket Ağ Geçidi Çöktü</h3>
+      <p style="font-size:12.5px; color:#94A3B8;">250k oyuncu lobilere yüklendi. Auth kilitlendi, DB deadlock zirve yaptı.</p>
+    </div>
+    <button class="btn-opt">A) Tüm Lobileri Kapat & 20:30 Snapshot Rollback</button>
+    <button class="btn-opt">B) Lobileri Dinamik Kuyruğa Al & Canlı Yama</button>
+    <div class="tutor">
+      🧠 <strong>Sokratik Danışman:</strong> "Rollback yaparsan son yarım saatte para yatıran oyuncuların işlemlerini nasıl koruyacaksın?"
+    </div>
+  </div>
+</body>
+</html>

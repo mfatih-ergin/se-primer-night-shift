@@ -1,0 +1,6 @@
+{
+  "name": "SE Primer: Night Shift — Season 5 Zero Hour",
+  "description": "YZM301 Yazılım Gerçekleme ve Test dersi kapsamında Neal Stephenson'ın Illustrated Primer konseptiyle kurgulanmış, Sokratik AI Tutor destekli çok oyunculu oyun sunucusu kriz simülasyonu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
