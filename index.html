@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SE Primer — Night Shift: Season 5 Zero Hour</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0b0f19;
+      --bg-card: #151d2f;
+      --bg-card-hover: #1c273e;
+      --border: #24324f;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.12);
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.12);
+      --warning: #f59e0b;
+      --tutor: #8b5cf6;
+      --tutor-bg: rgba(139, 92, 246, 0.15);
+      --text-main: #f9fafb;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #030712;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
+
+    /* Mobile Container Frame */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 440px;
+      height: 900px;
+      max-height: 96vh;
+      background: var(--bg-base);
+      border-radius: 36px;
+      border: 3px solid #1e293b;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(59, 130, 246, 0.15);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top Notch / Status Bar */
+    .status-bar {
+      height: 44px;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+
+    .status-bar .live-clock {
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Main Scrollable Content Area */
+    .app-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Typography & Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-crisis {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-tutor {
+      background: var(--tutor-bg);
+      color: var(--tutor);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: #fff;
+    }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Telemetry Widget */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .telemetry-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .telemetry-item .label {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .telemetry-item .value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .telemetry-item .value.danger { color: var(--danger); }
+    .telemetry-item .value.warning { color: var(--warning); }
+    .telemetry-item .value.success { color: var(--success); }
+
+    /* Cards and Form Controls */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .option-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .option-btn.selected {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.12);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+    }
+
+    .option-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .option-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-tutor {
+      background: var(--tutor-bg);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-tutor:hover {
+      background: rgba(139, 92, 246, 0.25);
+    }
+
+    /* Feedback Drawer / Explanation */
+    .feedback-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: fadeIn 0.2s ease-in;
+    }
+
+    .feedback-section {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .feedback-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .feedback-title.what { color: var(--primary); }
+    .feedback-title.why { color: var(--warning); }
+
+    .feedback-text {
+      font-size: 12.5px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+
+    /* Modal / Drawer for Socratic AI Tutor */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: none;
+      justify-content: flex-end;
+      flex-direction: column;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .tutor-sheet {
+      background: #111827;
+      border-top: 2px solid var(--tutor);
+      border-radius: 24px 24px 0 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 80%;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+    }
+
+    .tutor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .tutor-response-box {
+      background: rgba(139, 92, 246, 0.08);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #e9d5ff;
+      min-height: 60px;
+    }
+
+    .preset-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: rgba(139, 92, 246, 0.15);
+      color: #f1f5f9;
+      border-color: var(--tutor);
+    }
+
+    /* Senior Timer bar */
+    .timer-bar-container {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .timer-bar-fill {
+      height: 100%;
+      background: var(--danger);
+      width: 100%;
+      transition: width 1s linear;
+    }
+  </style>
+</head>
+<body>
+
+<div class="phone-wrapper" id="app">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div style="display:flex; align-items:center; gap:6px;">
+      <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#ef4444;" id="liveDot"></span>
+      <span id="roleLabel">SE PRIMER OPS</span>
+    </div>
+    <div class="live-clock" id="clockDisplay">21:00:00</div>
+  </div>
+
+  <!-- Senior Pressure Bar -->
+  <div class="timer-bar-container" id="seniorTimerBar">
+    <div class="timer-bar-fill" id="timerFill"></div>
+  </div>
+
+  <div class="app-viewport">
+
+    <!-- ==================== EKRAN 1: ONBOARDING / GİRİŞ ==================== -->
+    <div class="screen active" id="screenOnboarding">
+      <div>
+        <span class="badge badge-crisis">Kriz Simülasyonu</span>
+        <h1 style="margin-top: 8px;">Night Shift:<br>Season 5 Zero Hour</h1>
+        <p style="margin-top: 6px;">
+          Neal Stephenson'ın <em>Illustrated Primer</em> konsepti bu kez yazılım mühendisi için: oyuncu karar verir, simülatör o kararın teknik ve ekonomik sonucunu gösterir.
+        </p>
+      </div>
+
+      <!-- Soru 1: Seviye -->
+      <div class="card">
+        <div class="option-title">1. Mühendislik Seviyen</div>
+        <p style="font-size: 12px;">Simülasyonun zorluğu ve zaman baskısı seviyene göre uyarlanır.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+          <button type="button" class="option-btn selected" data-group="level" data-value="junior" onclick="selectOption(this)">
+            <span style="font-weight:700;">Junior</span>
+            <span class="option-desc">Kavramsal ipuçları & rehber</span>
+          </button>
+          <button type="button" class="option-btn" data-group="level" data-value="senior" onclick="selectOption(this)">
+            <span style="font-weight:700;">Senior</span>
+            <span class="option-desc">60 sn kriz sayacı baskısı</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Soru 2: Rol -->
+      <div class="card">
+        <div class="option-title">2. Operasyonel Rolün</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <button type="button" class="option-btn selected" data-group="role" data-value="backend" onclick="selectOption(this)">
+            <span class="option-title">Game Backend Mühendisi</span>
+            <span class="option-desc">Lobi, soket ve state senkronizasyonundan sorumlu.</span>
+          </button>
+          <button type="button" class="option-btn" data-group="role" data-value="sre" onclick="selectOption(this)">
+            <span class="option-title">SRE / Dağıtık Altyapı</span>
+            <span class="option-desc">Kapasite yönetimi, kuyruklar ve veritabanı kilitleri.</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Soru 3: Hedef -->
+      <div class="card">
+        <div class="option-title">3. Birincil Görev Hedefin</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <button type="button" class="option-btn selected" data-group="goal" data-value="zero-loss" onclick="selectOption(this)">
+            <span class="option-title">Sıfır Veri & Envanter Kaybı</span>
+            <span class="option-desc">Oyuncu satın alımları ve envanter bütünlüğü öncelikli.</span>
+          </button>
+          <button type="button" class="option-btn" data-group="goal" data-value="fast-recovery" onclick="selectOption(this)">
+            <span class="option-title">Hızlı Servis Restorasyonu</span>
+            <span class="option-desc">Lobileri ne pahasına olursa olsun ayakta tutmak.</span>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btnStartGame" onclick="startGame()">
+        Kriz Masasına Katıl (21:00) →
+      </button>
+    </div>
+
+    <!-- ==================== EKRAN 2: KRİZ VE KARAR ARENASI ==================== -->
+    <div class="screen" id="screenDecision">
+      <!-- Incident Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="badge badge-crisis" id="stageBadge">AŞAMA 1 · MİMARİ</span>
+        <button type="button" class="btn btn-tutor" style="padding: 6px 12px; font-size: 11.5px;" onclick="openTutorModal()">
+          🧠 Sokratik AI Rehber
+        </button>
+      </div>
+
+      <!-- Live Telemetry Box -->
+      <div class="telemetry-grid">
+        <div class="telemetry-item">
+          <span class="label">Eşzamanlı Oyuncu</span>
+          <span class="value warning" id="statCCU">248,910</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">WebSocket Gecikme</span>
+          <span class="value danger" id="statLatency">4,850 ms</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">DB Deadlock / sn</span>
+          <span class="value danger" id="statDeadlocks">92 / sn</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">Sistem Durumu</span>
+          <span class="value danger" id="statHealth">%15 Sağlık</span>
+        </div>
+      </div>
+
+      <!-- Decision Context & Question -->
+      <div class="card" id="decisionContextCard">
+        <h2 id="decisionTitle">08:00 Kriz Brifingi</h2>
+        <p id="decisionDescription">
+          Sezon 5 saat 21:00'da yayına alındı. 250 bin oyuncu aynı anda sezon bileti açmaya çalışıyor. Lobi sunucuları çöktü, veritabanında deadlock fırtınası var!
+        </p>
+      </div>
+
+      <!-- Choice Cards -->
+      <div style="display: flex; flex-direction: column; gap: 10px;" id="choicesContainer">
+        <button type="button" class="option-btn" id="choiceBtnA" onclick="handleDecisionChoice('A')">
+          <span class="option-title" id="choiceTitleA">A) Eski Sürüme Geri Dön (Rollback)</span>
+          <span class="option-desc" id="choiceDescA">Sunucuları bakıma al ve 20:30 snapshot yedeğini yükle.</span>
+        </button>
+
+        <button type="button" class="option-btn" id="choiceBtnB" onclick="handleDecisionChoice('B')">
+          <span class="option-title" id="choiceTitleB">B) Lobileri Dinamik Kuyruğa Al & Canlı Hotfix</span>
+          <span class="option-desc" id="choiceDescB">Girişleri rate-limiter ile yavaşlat ve deadlock yamasını prod'a sür.</span>
+        </button>
+      </div>
+
+      <!-- Post-Choice Explanation Box (Ne Oldu & Neden Oldu) -->
+      <div class="feedback-box" id="feedbackBox" style="display: none;">
+        <div class="feedback-section">
+          <span class="feedback-title what">Ne Oldu?</span>
+          <span class="feedback-text" id="feedbackWhat">Detay burada görünecek.</span>
+        </div>
+        <div class="feedback-section" style="margin-top: 4px;">
+          <span class="feedback-title why">Neden Oldu? (Teknik Gerekçe)</span>
+          <span class="feedback-text" id="feedbackWhy">Teknik sebep burada açıklanacak.</span>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnNextStep" style="margin-top: 8px;" onclick="advanceToNextStep()">
+          Sonraki Adıma Geç →
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== EKRAN 3: POST-MORTEM / SONUÇ ==================== -->
+    <div class="screen" id="screenResult">
+      <div style="text-align: center; margin-top: 10px;">
+        <span class="badge" id="outcomeBadge">DEĞERLENDİRME</span>
+        <h1 style="margin-top: 10px;" id="outcomeHeading">Sonuç Raporu</h1>
+        <p style="margin-top: 6px;" id="outcomeSubheading">Kriz sonrası teknik ve ekonomik durum analizi.</p>
+      </div>
+
+      <!-- Outcome Telemetry -->
+      <div class="telemetry-grid" style="margin-top: 8px;">
+        <div class="telemetry-item">
+          <span class="label">Sistem Kararlılığı</span>
+          <span class="value" id="finalStability">%85</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">Veri Bütünlüğü</span>
+          <span class="value" id="finalDataIntegrity">%100</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">Ekonomi & Bakiye</span>
+          <span class="value" id="finalEconomy">KORUNDU</span>
+        </div>
+        <div class="telemetry-item">
+          <span class="label">Mühendislik Skoru</span>
+          <span class="value" id="finalScore">90 / 100</span>
+        </div>
+      </div>
+
+      <!-- Post-Mortem Details -->
+      <div class="card" id="postMortemCard">
+        <h2>Post-Mortem & Öğrenilen Dersler</h2>
+        <p id="postMortemText" style="line-height: 1.6;">
+          Kriz yönetimi analizi.
+        </p>
+      </div>
+
+      <!-- Decision Recap -->
+      <div class="card" style="font-size: 12.5px;">
+        <span style="font-weight: 600; color:#fff;">Verilen Kararların Özeti:</span>
+        <ul id="decisionsSummaryList" style="padding-left: 18px; color: var(--text-muted); display:flex; flex-direction:column; gap:6px; margin-top:4px;">
+        </ul>
+      </div>
+
+      <button type="button" class="btn btn-primary" onclick="restartGame()" id="btnRestart">
+        🔄 Simülasyonu Yeniden Başlat
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SOKRATİK AI TUTOR MODAL / SHEET -->
+  <div class="modal-overlay" id="tutorModal">
+    <div class="tutor-sheet">
+      <div class="tutor-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge badge-tutor">Sokratik Tutor</span>
+          <span style="font-size: 13px; font-weight:600; color:#fff;">Kıdemli Danışman</span>
+        </div>
+        <button type="button" class="close-btn" onclick="closeTutorModal()">✕</button>
+      </div>
+
+      <p style="font-size: 12px; color: var(--text-muted);">
+        AI Danışman sana asla doğrudan cevabı söylemez; doğru soruyu sorarak teknik gerçeği bulmanı sağlar.
+      </p>
+
+      <div class="tutor-response-box" id="tutorResponse">
+        "Geri dönmeden önce, son 20 dakikada gerçek para harcayıp kasa açan 40.000 oyuncunun satın alımlarını nasıl koruyacaksın?"
+      </div>
+
+      <div class="preset-questions">
+        <span style="font-size: 11px; text-transform:uppercase; color:var(--text-dim); font-weight:600;">Öğrenci Soru Örnekleri:</span>
+        <button type="button" class="preset-btn" onclick="askTutor('Doğrudan eski yedeğe (rollback) dönersem ne kaybederim?')">
+          ❓ "Doğrudan eski yedeğe (rollback) dönersem ne kaybederim?"
+        </button>
+        <button type="button" class="preset-btn" onclick="askTutor('Test koşmadan doğrudan canlıya yama atarsam en kötü ne olabilir?')">
+          ❓ "Test koşmadan canlıya yama atarsam en kötü ne olabilir?"
+        </button>
+        <button type="button" class="preset-btn" onclick="askTutor('Hangisi doğru cevap? A mı B mi?')">
+          ❓ "Hangisi doğru cevap? A mı B mi?"
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Game State
+  const state = {
+    profile: {
+      level: 'junior',
+      role: 'backend',
+      goal: 'zero-loss'
+    },
+    currentStage: 1, // 1: Mimari, 2: Test, 3: Veri
+    selectedChoices: {},
+    hasDupeBug: false,
+    score: 0,
+    seniorTimeRemaining: 60,
+    timerInterval: null
+  };
+
+  // Decisions Database (3 Decisions, 2 Out of Outcome)
+  const decisions = [
+    {
+      stage: 1,
+      badge: "AŞAMA 1 · MİMARİ & TRAFİK",
+      title: "21:00 — WebSocket Ağ Geçidi Çöktü",
+      description: "250.000 eşzamanlı oyuncu Sezon 5 güncellemesiyle lobilere hücum etti. Auth ve envanter soketleri kilitlendi, DB deadlock oranı tepe yaptı. Ne yapacaksın?",
+      choiceA: {
+        title: "A) Tüm Lobileri Bakıma Al & 20:30 Snapshot'ına Dön",
+        desc: "Sunucuları tamamen kapat. Veritabanını sezon güncellemesi öncesine rollback yap.",
+        isCorrect: false,
+        what: "Tüm lobiler ve soketler anında kapatıldı. Veritabanı 20:30 haline döndürüldü.",
+        why: "Sunucu yükü sıfırlandı ancak son 30 dakikada kredi kartıyla sezon bileti satın alan 45.000 oyuncunun envanter işlemi silindi. Topluluk sosyal medyada ayaklandı!",
+        tutorHint: "Snapshot yedeğine döndüğünde, son 30 dakikadaki ödeme ağ geçidi webhook'ları ile veritabanı arasındaki mutabakat farkını nasıl telafi edeceksin?"
+      },
+      choiceB: {
+        title: "B) Lobileri Dinamik Kuyruğa Al & Canlı Deadlock Yaması",
+        desc: "Giriş kapısına rate-limiter ve Redis kuyruğu koy, arka planda deadlock çözen index yamasını prod'a sür.",
+        isCorrect: true,
+        what: "Kademeli kuyruk (backpressure) devreye alındı. Deadlock index yaması canlıya yüklendi.",
+        why: "Sistem trafiği yumuşatıldı. Veri kaybı yaşanmadan sunucular kademeli olarak lobiye oyuncu almaya başladı.",
+        tutorHint: "Veritabanını birden kapatmak yerine trafiği boğazlayan bir kuyruk (backpressure) mekanizması uygularsan veritabanı kilitleri ne olur?"
+      }
+    },
+    {
+      stage: 2,
+      badge: "AŞAMA 2 · DOĞRULAMA & TEST",
+      title: "21:15 — Yama Hazır, Canlıya Nasıl Geçeceksin?",
+      description: "Yazılımcılar envanter race condition'ını çözdüğünü iddia eden bir yama getirdi. Oyuncular kapıda bekliyor. Doğrulama stratejin ne?",
+      choiceA: {
+        title: "A) Staging Ortamında 10.000 Sanal Botla Yük Testi Koş",
+        desc: "8 dakikalık otomatik headless bot testi çalıştır; eşya dupe (kopyalama) hatasını doğrula.",
+        isCorrect: true,
+        what: "10.000 sanal bot testi eşzamanlı satın alım senaryosunda gizli bir mutex açığını yakaladı ve düzeltildi.",
+        why: "Mühendislik doğrulaması sayesinde potansiyel bir ekonomik felaket önlendi; yama güvenle canlıya taşındı.",
+        tutorHint: "Milyon dolarlık oyun ekonomisinde 8 dakikalık bir test koşusu mu daha maliyetlidir, yoksa ekonomi çöktükten sonra yapılacak veri temizliği mi?"
+      },
+      choiceB: {
+        title: "B) Testi Atla, Yamayı Doğrudan Canlı Prod'a Sür",
+        desc: "Zaman kalmadı, her saniye oyuncu kaybediyoruz! Yamayı direkt tüm sunuculara dağıt.",
+        isCorrect: false,
+        what: "Yama doğrudan prodüksiyona yüklendi. Görünürde lobiler açıldı fakat gizli bir race condition yayıldı.",
+        why: "Eşzamanlı kutu açan oyuncular aynı eşyayı 2 kez elde edebildi (Item Dupe Exploit canlıya sızdı).",
+        tutorHint: "Eşzamanlılık (concurrency) hataları tek bir istekte belli olmaz. Yüzbinlerce isteğin yarıştığı anda thread-safety'yi test etmeden canlıda nasıl gözlemleyebilirsin?"
+      }
+    },
+    {
+      stage: 3,
+      badge: "AŞAMA 3 · VERİ BÜTÜNLÜĞÜ & EKONOMİ",
+      title: "21:30 — Envanter Loglarında Anomali",
+      description: "Sistem ayakta fakat loglarda bazı hesapların şüpheli biçimde eşyalarını ikiye katladığı görülüyor. Kararın nedir?",
+      choiceA: {
+        title: "A) Dupe İşlemleri Loglardan Tara & Hileli Hesapları Dondur",
+        desc: "Kafka transaction loglarını filtrele, exploit kullananları tespit et ve mağdur olmayanlara telafi sandığı ver.",
+        isCorrect: true,
+        what: "Loglar taranarak 1.200 exploit hesabı izole edildi. Masum oyunculara özür hediyesi gönderildi.",
+        why: "Oyun içi pazar ekonomisi enflasyondan korundu; adaletin sağlanması oyuncu güvenini geri kazandı.",
+        tutorHint: "Veri bütünlüğünü sağlamadan görmezden gelmek, oyunun takas pazarı ve oyuncu sadakati üzerinde 1 ay sonra nasıl bir etki yaratır?"
+      },
+      choiceB: {
+        title: "B) Logları Görmezden Gel & Hızlıca Kriz Masasını Kapat",
+        desc: "Sunucular yeşil görünüyor. Olayı büyütmeyelim, logları temizleyip geçelim.",
+        isCorrect: false,
+        what: "Dupe eşyalar serbest pazara saçıldı. Nadir eşyaların değeri sıfıra indi.",
+        why: "Oyun ekonomisi çöktü. Gerçek para harcayan sadık oyuncular oyunu terk ederek Steam incelemelerini 'Çoğunlukla Olumsuz' yaptı.",
+        tutorHint: "Bir veritabanında sessiz bozulma (silent corruption) olduğunda, sistemin çalışıyor görünmesi gerçekten başarılı olduğu anlamına gelir mi?"
+      }
+    }
+  ];
+
+  // Helper Functions
+  function selectOption(el) {
+    const group = el.getAttribute('data-group');
+    const value = el.getAttribute('data-value');
+    document.querySelectorAll(`.option-btn[data-group="${group}"]`).forEach(btn => btn.classList.remove('selected'));
+    el.classList.add('selected');
+    state.profile[group] = value;
+  }
+
+  function startGame() {
+    document.getElementById('screenOnboarding').classList.remove('active');
+    document.getElementById('screenDecision').classList.add('active');
+
+    // Update Role Tag
+    const roleMap = {
+      'backend': 'GAME BACKEND',
+      'sre': 'SRE / INFRA',
+      'architect': 'DISTRIBUTED ARCH'
+    };
+    document.getElementById('roleLabel').innerText = `${roleMap[state.profile.role] || 'MÜHENDİS'} [${state.profile.level.toUpperCase()}]`;
+
+    // Senior Timer Activation
+    if (state.profile.level === 'senior') {
+      document.getElementById('seniorTimerBar').style.display = 'block';
+      startSeniorTimer();
+    }
+
+    loadDecisionStage(1);
+  }
+
+  function startSeniorTimer() {
+    state.seniorTimeRemaining = 60;
+    const fill = document.getElementById('timerFill');
+    fill.style.width = '100%';
+
+    if (state.timerInterval) clearInterval(state.timerInterval);
+
+    state.timerInterval = setInterval(() => {
+      state.seniorTimeRemaining--;
+      const pct = (state.seniorTimeRemaining / 60) * 100;
+      fill.style.width = `${pct}%`;
+
+      if (state.seniorTimeRemaining <= 0) {
+        clearInterval(state.timerInterval);
+        handleDecisionChoice('A'); // Default panic rollback on timeout
+      }
+    }, 1000);
+  }
+
+  function loadDecisionStage(stageNum) {
+    state.currentStage = stageNum;
+    const currentDec = decisions[stageNum - 1];
+
+    document.getElementById('stageBadge').innerText = currentDec.badge;
+    document.getElementById('decisionTitle').innerText = currentDec.title;
+    document.getElementById('decisionDescription').innerText = currentDec.description;
+
+    document.getElementById('choiceTitleA').innerText = currentDec.choiceA.title;
+    document.getElementById('choiceDescA').innerText = currentDec.choiceA.desc;
+
+    document.getElementById('choiceTitleB').innerText = currentDec.choiceB.title;
+    document.getElementById('choiceDescB').innerText = currentDec.choiceB.desc;
+
+    // Reset feedback and option states
+    document.getElementById('feedbackBox').style.display = 'none';
+    document.getElementById('choiceBtnA').classList.remove('selected');
+    document.getElementById('choiceBtnB').classList.remove('selected');
+    document.getElementById('choiceBtnA').style.pointerEvents = 'auto';
+    document.getElementById('choiceBtnB').style.pointerEvents = 'auto';
+
+    // Update Telemetry visually
+    updateTelemetry(stageNum);
+  }
+
+  function updateTelemetry(stageNum) {
+    const ccu = document.getElementById('statCCU');
+    const lat = document.getElementById('statLatency');
+    const deadlocks = document.getElementById('statDeadlocks');
+    const health = document.getElementById('statHealth');
+
+    if (stageNum === 1) {
+      ccu.innerText = "248,910";
+      lat.innerText = "4,850 ms";
+      deadlocks.innerText = "92 / sn";
+      health.innerText = "%15 Sağlık";
+    } else if (stageNum === 2) {
+      ccu.innerText = "210,400";
+      lat.innerText = "1,120 ms";
+      deadlocks.innerText = "14 / sn";
+      health.innerText = "%60 Sağlık";
+      health.className = "value warning";
+    } else if (stageNum === 3) {
+      ccu.innerText = "235,000";
+      lat.innerText = "45 ms";
+      deadlocks.innerText = "0 / sn";
+      health.innerText = "%85 Sağlık";
+      health.className = "value success";
+    }
+  }
+
+  function handleDecisionChoice(choiceKey) {
+    if (state.timerInterval) clearInterval(state.timerInterval);
+
+    const currentDec = decisions[state.currentStage - 1];
+    const chosen = choiceKey === 'A' ? currentDec.choiceA : currentDec.choiceB;
+
+    state.selectedChoices[`stage_${state.currentStage}`] = choiceKey;
+
+    if (chosen.isCorrect) {
+      state.score += 35;
+    } else {
+      if (state.currentStage === 2) state.hasDupeBug = true;
+    }
+
+    // Highlight chosen button and disable clicks
+    const btnA = document.getElementById('choiceBtnA');
+    const btnB = document.getElementById('choiceBtnB');
+    if (choiceKey === 'A') btnA.classList.add('selected');
+    else btnB.classList.add('selected');
+    btnA.style.pointerEvents = 'none';
+    btnB.style.pointerEvents = 'none';
+
+    // Show What and Why Feedback
+    const fbBox = document.getElementById('feedbackBox');
+    document.getElementById('feedbackWhat').innerText = chosen.what;
+    document.getElementById('feedbackWhy').innerText = chosen.why;
+    fbBox.style.display = 'flex';
+  }
+
+  function advanceToNextStep() {
+    if (state.currentStage < 3) {
+      if (state.profile.level === 'senior') startSeniorTimer();
+      loadDecisionStage(state.currentStage + 1);
+    } else {
+      showFinalOutcome();
+    }
+  }
+
+  function showFinalOutcome() {
+    document.getElementById('screenDecision').classList.remove('active');
+    document.getElementById('screenResult').classList.add('active');
+    document.getElementById('seniorTimerBar').style.display = 'none';
+
+    const isSuccess = state.score >= 70;
+    const badge = document.getElementById('outcomeBadge');
+    const heading = document.getElementById('outcomeHeading');
+    const subheading = document.getElementById('outcomeSubheading');
+    const postMortemText = document.getElementById('postMortemText');
+
+    if (isSuccess) {
+      badge.className = "badge badge-success";
+      badge.innerText = "STABILIZED · BAŞARILI SON";
+      heading.innerText = "21:45 — Sezon 5 Kurtarıldı!";
+      subheading.innerText = "Mühendislik kararların oyun sunucularını ve pazar ekonomisini kurtardı.";
+      document.getElementById('finalStability').innerText = "%94";
+      document.getElementById('finalStability').className = "value success";
+      document.getElementById('finalDataIntegrity').innerText = "%100 (Sıfır Kayıp)";
+      document.getElementById('finalDataIntegrity').className = "value success";
+      document.getElementById('finalEconomy').innerText = "GÜVENDE";
+      document.getElementById('finalEconomy').className = "value success";
+      document.getElementById('finalScore').innerText = `${state.score} / 100`;
+
+      postMortemText.innerText = "Kriz anında panikle monolitik rollback yapmak yerine kuyruk yönetimi (backpressure) uyguladın. Canlıya çıkmadan önce bot yük testleriyle mutex açığını yakaladın ve şüpheli logları ayıklayarak oyun ekonomisinin enflasyonla çökmesini engelledin. Mühendislik vizyonu budur!";
+    } else {
+      badge.className = "badge badge-crisis";
+      badge.innerText = "COLLAPSE · FELAKET SON";
+      heading.innerText = "22:15 — Ekonomi ve İtibar Çöktü!";
+      subheading.innerText = "Acele ve doğrulanmamış kararlar zincirleme veri felaketine yol açtı.";
+      document.getElementById('finalStability').innerText = "%32";
+      document.getElementById('finalStability').className = "value danger";
+      document.getElementById('finalDataIntegrity').innerText = "%40 (Kayıp & Dupe)";
+      document.getElementById('finalDataIntegrity').className = "value danger";
+      document.getElementById('finalEconomy').innerText = "ÇÖKTÜ";
+      document.getElementById('finalEconomy').className = "value danger";
+      document.getElementById('finalScore').innerText = `${state.score} / 100`;
+
+      postMortemText.innerText = "Yapılan seçimlerde test aşaması atlandı veya veri bütünlüğü hiçe sayıldı. Sunucular ayakta gibi görünse de arka planda çoğalan exploit eşyalar pazar ekonomisini bitirdi. Sadık oyuncular hesaplarını sildi ve şirket ciddi tazminat davalarıyla karşılaştı.";
+    }
+
+    // Summarize choices
+    const list = document.getElementById('decisionsSummaryList');
+    list.innerHTML = `
+      <li><strong>Aşama 1 (Mimari):</strong> ${state.selectedChoices.stage_1 === 'B' ? '✅ Dinamik Kuyruk & Canlı Yama' : '❌ Acele Rollback (Veri Silindi)'}</li>
+      <li><strong>Aşama 2 (Test):</strong> ${state.selectedChoices.stage_2 === 'A' ? '✅ 10k Bot Yük Testi Koşuldu' : '❌ Test Atlandı (Race Condition Canlıya Geçti)'}</li>
+      <li><strong>Aşama 3 (Veri):</strong> ${state.selectedChoices.stage_3 === 'A' ? '✅ Log Taraması & Hile İzolasyonu' : '❌ Loglar Yok Sayıldı (Ekonomi Patladı)'}</li>
+    `;
+  }
+
+  function restartGame() {
+    state.currentStage = 1;
+    state.selectedChoices = {};
+    state.hasDupeBug = false;
+    state.score = 0;
+    if (state.timerInterval) clearInterval(state.timerInterval);
+
+    document.getElementById('screenResult').classList.remove('active');
+    document.getElementById('screenOnboarding').classList.add('active');
+  }
+
+  // Socratic AI Tutor Modal Functions
+  function openTutorModal() {
+    const currentDec = decisions[state.currentStage - 1];
+    document.getElementById('tutorResponse').innerText = `"${currentDec.choiceA.tutorHint}"`;
+    document.getElementById('tutorModal').classList.add('open');
+  }
+
+  function closeTutorModal() {
+    document.getElementById('tutorModal').classList.remove('open');
+  }
+
+  function askTutor(question) {
+    const respBox = document.getElementById('tutorResponse');
+    respBox.innerText = "Düşünülüyor...";
+
+    setTimeout(() => {
+      if (question.includes("Hangisi doğru") || question.includes("A mı B mi")) {
+        respBox.innerText = "“Bir mühendisin görevi hazır cevap seçmek değil; her seçeneğin getireceği teknik borcu tartmaktır. Bir rollback yaptığında ödeme sağlayıcısından dönen onaylanmış token'ları nasıl sıfırlayacaksın?”";
+      } else if (question.includes("rollback") || question.includes("yedeğe")) {
+        respBox.innerText = "“Eski bir veritabanı yedeğine döndüğünde, son yarım saatte para harcayan oyuncular ve kilitli kalan oturumlar sana ne tür bir hukuki ve finansal sorumluluk yükler?”";
+      } else if (question.includes("Test") || question.includes("test")) {
+        respBox.innerText = "“Yüzbinlerce soket aynı anda aynı Redis anahtarına yazarken tek bir thread'in kilitlenmesi tüm lobi havuzunu nasıl etkiler? Bunu canlı oyuncular üzerinde mi test etmek istersin?”";
+      } else {
+        respBox.innerText = "“Seçimini yapmadan önce kendine sor: Bu kararın 1 saat sonraki veritabanı loglarına ve oyuncu memnuniyetine yansıması ne olacak?”";
+      }
+    }, 300);
+  }
+</script>
+</body>
+</html>
