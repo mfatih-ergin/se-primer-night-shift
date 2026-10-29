@@ -30,6 +30,7 @@ Tasarım prototipi Google Stitch ilkeleri doğrultusunda 3 ana mobil ekrandan ol
 ## 3. Üç Ana Mobil Ekran Mimarisi
 
 ### Ekran 1: Karşılama ve Kişiselleştirme (Onboarding Screen)
+![Ekran 1: Giriş ve Profilleme](design/giris.png)
 * **Bileşenler:**
   * Üst Bölüm: "SE Primer" logosu, "Season 5 Zero Hour" kriz başlığı ve alt başlık ("Dağıtık Sistem Kriz Simülasyonu").
   * 3'lü Profilleme Kartları:
@@ -39,6 +40,7 @@ Tasarım prototipi Google Stitch ilkeleri doğrultusunda 3 ana mobil ekrandan ol
   * Eylem Butonu: "Kriz Masasına Katıl (21:00)" (Geniş birincil buton).
 
 ### Ekran 2: Kriz Masası ve Karar Arenası (Crisis Decision Arena)
+![Ekran 2: Kriz Masası ve Karar Arenası](design/sahne.png)
 * **Bileşenler:**
   * Başlık Çubuğu: Kriz Saati (`21:00`), Sistem Sağlık Barı (`%18 Sağlık`), Senior oyuncular için 60 sn geri sayım sayacı (`Timer: 00:58`).
   * Telemetri Kartı: Gerçek zamanlı grafik ve log akışı (`WebSocket Latency: 4200ms`, `DB Deadlocks: 84/sec`, `Concurrent Users: 248.512`).
@@ -48,6 +50,7 @@ Tasarım prototipi Google Stitch ilkeleri doğrultusunda 3 ana mobil ekrandan ol
   * "Ne Oldu & Neden Oldu" Geri Bildirim Bölümü: Karar seçildikten sonra animasyonla beliren kök neden analiz kartı ve "Sonraki Adıma Geç" butonu.
 
 ### Ekran 3: Post-Mortem ve Sonuç Raporu (Outcome & Evaluation Screen)
+![Ekran 3: Post-Mortem ve Sonuç Raporu](design/son.png)
 * **Bileşenler:**
   * Nihai Durum Rozeti:
     * *İyi Son:* `[STABILIZED]` Yeşil rozet, "21:45 — Sezon 5 Kurtarıldı, Ekonomi Güvende!"
