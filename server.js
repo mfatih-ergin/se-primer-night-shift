@@ -3,8 +3,33 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
+// Auto-load .env file if present
+if (fs.existsSync('.env')) {
+  try {
+    const envContent = fs.readFileSync('.env', 'utf-8');
+    for (const line of envContent.split('\n')) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#') && trimmed.includes('=')) {
+        const [key, ...vals] = trimmed.split('=');
+        const val = vals.join('=').trim().replace(/^["']|["']$/g, '');
+        if (!process.env[key.trim()]) {
+          process.env[key.trim()] = val;
+        }
+      }
+    }
+    console.log('✓ .env file loaded successfully.');
+  } catch (err) {
+    console.warn('Could not read .env file:', err.message);
+  }
+}
+
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+if (GEMINI_API_KEY) {
+  console.log('✓ Gemini API Key detected! Live AI Tutor is active.');
+} else {
+  console.log('ℹ No Gemini API Key found. Running with deterministic Socratic engine.');
+}
 
 // 20 Benchmark Eval Cases for the Socratic Tutor
 const BENCHMARK_CASES = [

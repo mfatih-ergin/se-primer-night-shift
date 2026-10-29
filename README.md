@@ -5,11 +5,11 @@
 ---
 
 ## 📌 Proje Künyesi ve Öğrenci Bilgileri
-* **Adı Soyadı:** [Öğrenci Adı Soyadı]
-* **Öğrenci No:** [Öğrenci Numarası]
-* **E-Posta:** [ogrenci@universite.edu.tr]
+* **Adı Soyadı:** Fatih ERGİN
+* **Öğrenci No:** [Öğrenci Numaranız]
+* **E-Posta:** f.ergin162@gmail.com
 * **GitHub Profili:** [github.com/kullanici-adi]
-* **Google AI Studio / Canlı Uygulama Linki:** `http://localhost:3000` (veya AI Studio paylaşılan Web App URL'i)
+* **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/f9074fcd-e60d-4c94-b0b4-588efecfd793?fullscreenApplet=true](https://ai.studio/apps/f9074fcd-e60d-4c94-b0b4-588efecfd793?fullscreenApplet=true)
 * **Cypress Demo Video:** `cypress/videos/simulator.cy.js.mp4`
 
 ---
