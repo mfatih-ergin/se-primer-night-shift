@@ -7,12 +7,13 @@
 
 ## 📌 Proje Künyesi ve Öğrenci Bilgileri
 
-- **Adı Soyadı:** Fatih ERGİN
+- **Adı Soyadı:** Muhammet Fatih ERGİN
 - **Öğrenci No:** 241478059
 - **E-Posta:** f.ergin162@gmail.com
-- **GitHub Profili:** [github.com/kullanici-adi]
+- **GitHub Deposu:** [https://github.com/mfatih-ergin/se-primer-night-shift](https://github.com/mfatih-ergin/se-primer-night-shift)
 - **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true](https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true)
-- **Cypress Demo Video:** `cypress/videos/simulator.cy.js.mp4`
+- **YouTube Demo & E2E Test Videosu:** [https://youtu.be/_5S39nzm7bA](https://youtu.be/_5S39nzm7bA)
+- **Cypress Yerel Demo Video Dosyası:** `cypress/videos/simulator.cy.js.mp4`
 
 ---
 
