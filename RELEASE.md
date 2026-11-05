@@ -15,7 +15,7 @@ Bu doküman, **SE Primer: Night Shift** uygulamasının kural tabanlı `v1.0` s�
 * **Hugging Face Model Reposu ve Commit Pinning:**
   Tüketiciler modeli kontrolsüz `main` dalından değil, doğrulanmış ve dondurulmuş commit hash'i üzerinden indirir:
   ```text
-  https://huggingface.co/mfatih-ergin/se-primer-panic-onnx/resolve/9f8c12a7e4b/model.onnx
+  https://huggingface.co/Fatih162/se-primer-panic-onnx/resolve/36bff0c0cdbe2887ea05a0f71e0afd53209921d2/model.onnx
   ```
 
 ---
