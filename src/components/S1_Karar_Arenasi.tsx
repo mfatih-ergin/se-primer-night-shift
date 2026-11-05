@@ -242,8 +242,18 @@ export const S1_Karar_Arenasi: React.FC<S1_Karar_ArenasiProps> = ({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`w-6 h-6 rounded flex items-center justify-center font-mono font-bold text-xs ${
-                      isSelected ? 'bg-[#3B82F6] text-white' : 'bg-[#0B0F19] border border-[#24324F] text-[#94A3B8]'
+                    data-cy={`select-choice-${choice.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      soundEffects.playClick();
+                      if (selectedChoiceId && selectedChoiceId !== choice.id) {
+                        setSwitchCount((c) => c + 1);
+                      }
+                      setSelectedChoiceId(choice.id);
+                    }}
+                    title="Seçeneği incele / ön seç"
+                    className={`w-6 h-6 rounded flex items-center justify-center font-mono font-bold text-xs transition-all ${
+                      isSelected ? 'bg-[#3B82F6] text-white ring-1 ring-[#3B82F6]' : 'bg-[#0B0F19] border border-[#24324F] text-[#94A3B8] hover:border-[#3B82F6]'
                     }`}
                   >
                     {choice.id}

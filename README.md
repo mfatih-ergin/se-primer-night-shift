@@ -12,9 +12,12 @@
 - **E-Posta:** f.ergin162@gmail.com
 - **GitHub Deposu:** [https://github.com/mfatih-ergin/se-primer-night-shift](https://github.com/mfatih-ergin/se-primer-night-shift)
 - **Hugging Face Model Deposu (Commit'e Sabitlenmiş):** [https://huggingface.co/Fatih162/se-primer-panic-onnx/resolve/36bff0c0cdbe2887ea05a0f71e0afd53209921d2/model.onnx](https://huggingface.co/Fatih162/se-primer-panic-onnx)
-- **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true](https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true)
-- **YouTube Demo & E2E Test Videosu:** [https://youtu.be/_5S39nzm7bA](https://youtu.be/_5S39nzm7bA)
-- **Cypress Yerel Demo Video Dosyası:** `cypress/videos/simulator.cy.js.mp4`
+- **Canlı Web Uygulama Linki (GitHub Pages & AI Studio):**
+  - [GitHub Pages Canlı Uygulama](https://mfatih-ergin.github.io/se-primer-night-shift/)
+  - [Google AI Studio Canlı Uygulama](https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true)
+- **YouTube Demo Videosu:** [https://youtu.be/_5S39nzm7bA](https://youtu.be/_5S39nzm7bA)
+- **83 Saniyelik Adaptif Model Demo Videosu (Yerel Dosya):** `cypress/videos/demo_video.cy.js.mp4`
+- **7/7 E2E ve Diferansiyel Parite Test Videosu:** `cypress/videos/simulator.cy.js.mp4`
 
 ---
 
