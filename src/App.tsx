@@ -16,12 +16,14 @@ import { HeaderHUD } from './components/HeaderHUD';
 import { S0_Giris_Profil } from './components/S0_Giris_Profil';
 import { S1_Karar_Arenasi } from './components/S1_Karar_Arenasi';
 import { S2_Sonuc_PostMortem } from './components/S2_Sonuc_PostMortem';
+import { ParityTestModal } from './components/ParityTestModal';
 import { soundEffects } from './utils/audio';
 
 type ScreenState = 'profile' | 'decision' | 'result';
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenState>('profile');
+  const [isParityModalOpen, setIsParityModalOpen] = useState(false);
   const [profile, setProfile] = useState<EngineerProfile>({
     level: 'junior',
     role: 'backend',
@@ -173,6 +175,7 @@ export default function App() {
             remainingSeconds={remainingSeconds}
             isMuted={isMuted}
             onToggleMute={handleToggleMute}
+            onOpenParityModal={() => setIsParityModalOpen(true)}
           />
         )}
 
@@ -182,6 +185,7 @@ export default function App() {
             profile={profile}
             onChangeProfile={setProfile}
             onStartSimulation={handleStartSimulation}
+            onOpenParityModal={() => setIsParityModalOpen(true)}
           />
         )}
 
@@ -208,6 +212,12 @@ export default function App() {
             onRestart={handleRestart}
           />
         )}
+
+        {/* Differential Parity Test Modal */}
+        <ParityTestModal
+          isOpen={isParityModalOpen}
+          onClose={() => setIsParityModalOpen(false)}
+        />
       </div>
     </div>
   );

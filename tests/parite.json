@@ -1,0 +1,84 @@
+{
+  "description": "Python Referans Test Kahini (Oracle) Parite Girdileri ve Beklenen Olasılıklar",
+  "tolerance": 0.0001,
+  "features": [
+    "seviye_kod",
+    "sahne_no",
+    "karar_suresi_sn",
+    "secenek_degistirme_sayisi",
+    "ipucu_tiklama_sayisi",
+    "onceki_asama_hatasi"
+  ],
+  "cases": [
+    {
+      "id": "ref_1_calm_senior",
+      "tanim": "Soğukkanlı Senior SRE (Aşama 1, 12 saniye, 0 kararsızlık)",
+      "input": [
+        1.0,
+        1.0,
+        12.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_prob_panic": 0.001698,
+      "expected_class": 0
+    },
+    {
+      "id": "ref_2_overloaded_junior",
+      "tanim": "Bilişsel Aşırı Yüklenme Yaşayan Junior (Aşama 2, 45 saniye, 4 kararsızlık, hata var)",
+      "input": [
+        0.0,
+        2.0,
+        45.0,
+        4.0,
+        3.0,
+        1.0
+      ],
+      "expected_prob_panic": 0.995145,
+      "expected_class": 1
+    },
+    {
+      "id": "ref_3_balanced_mid",
+      "tanim": "Dengeli Mühendis (Aşama 2, 25 saniye, 1 kararsızlık, 1 ipucu)",
+      "input": [
+        0.0,
+        2.0,
+        25.0,
+        1.0,
+        1.0,
+        0.0
+      ],
+      "expected_prob_panic": 0.105836,
+      "expected_class": 0
+    },
+    {
+      "id": "ref_4_late_panic_senior",
+      "tanim": "Sürenin Sonuna Gelen Senior (Aşama 3, 55 saniye, 3 kararsızlık, 2 ipucu)",
+      "input": [
+        1.0,
+        3.0,
+        55.0,
+        3.0,
+        2.0,
+        1.0
+      ],
+      "expected_prob_panic": 0.992616,
+      "expected_class": 1
+    },
+    {
+      "id": "ref_5_quick_junior",
+      "tanim": "Hızlı ve Net Karar Veren Junior (Aşama 1, 15 saniye, 0 kararsızlık)",
+      "input": [
+        0.0,
+        1.0,
+        15.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_prob_panic": 0.003261,
+      "expected_class": 0
+    }
+  ]
+}

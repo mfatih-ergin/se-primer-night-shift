@@ -64,9 +64,59 @@ Bu uygulama, **Neal Stephenson'ın *The Diamond Age*** eserindeki uyarlanabilir 
 * **When (Eylem):** Yaptığı seçimler veri bütünlüğünü ve test disiplinini koruyorsa (en az 2 doğru teknik karar),
 * **Then (Beklenen Sonuç):** Sistem durumu `RESULT_GOOD` olur ve "Başarı: Sezon 5 Kurtarıldı" raporu ve rozeti verilir; aksi takdirde `RESULT_BAD` ("Ekonomi Çöktü") ekranı detaylı post-mortem analiziyle sunulur.
 
+#### Kabul Örneği 6 (v2.0 ML): Bilişsel Aşırı Yüklenme Tespiti ve Proaktif Sokratik Müdahale
+* **Given (Koşul):** Kullanıcı bir karar aşamasındayken (Örn: Aşama 1 veya 2),
+* **When (Eylem):** Karar süresi 20 saniyeyi aştığında, seçenekler arasında 2'den fazla kez kararsızca geçiş yaptığında ve önceki aşamada hata yapmış olduğunda, istemci tarafındaki gömülü ONNX modeli çıkarım (inference) yapar,
+* **Then (Beklenen Sonuç):** Modelin hesapladığı panik/aşırı yüklenme olasılığı $P(\text{panik}) \ge 0.65$ eşiğini geçer; arayüzde dinamik olarak `🧠 BİLİŞSEL AŞIRI YÜKLENME // PANİK TESPİT EDİLDİ` uyarısı belirir, Sokratik Danışman otomatik olarak devreye girip zihni toparlayıcı mimari ipucunu açar ve süre sayacı dondurularak mühendise nefes payı tanınır.
+
+#### Kabul Örneği 7 (v2.0 ML): Soğukkanlı Mühendis Tespiti ve İleri Düzey Telemetri
+* **Given (Koşul):** Kullanıcı kararlarını hızlı ve kararlı şekilde incelerken,
+* **When (Eylem):** Karar süresi 10 saniyenin altında kaldığında, seçenekler arasında lüzumsuz geçiş yapmadığında ve telemetriyi doğrudan analiz ettiğinde,
+* **Then (Beklenen Sonuç):** Model $P(\text{panik}) < 0.40$ üretir; sistem durumu `SOĞUKKANLI_MÜHENDİS` moduna geçer, gereksiz arayüz gürültüsü gizlenir ve ileri düzey dağıtık sistem metrikleri (P99 tail latency, connection pool saturation grafiği) ön plana çıkarılır.
+
+#### Kabul Örneği 8 (v2.0 ML): Diferansiyel Test ve Sayısal Hata Toleransı
+* **Given (Koşul):** Aynı referans girdi vektörü hem Python test kahinine (Oracle - `tests/parite.py`) hem de tarayıcıdaki/istemcideki `onnxruntime-web` çıkarım motoruna verildiğinde,
+* **When (Eylem):** İki farklı ortamda aynı `model.onnx` artefaktı üzerinden bağımsız çıkarım koşturulduğunda,
+* **Then (Beklenen Sonuç):** İki çıkarım çıktısı arasındaki mutlak fark belirlenen sayısal hata toleransı sınırını aşamaz: $|P_{\text{python}} - P_{\text{web}}| \le 10^{-4}$ ($10^{-4}$ = `1e-4`). Bu koşul sağlanmazsa CI/CD ve test adımı hata vererek durur.
+
 ---
 
-### 4. Durum Makinesi ve Akış Şeması (State Diagram)
+### 5. Göreve Özel Küçük Model (ONNX) Spesifikasyonu ve Kabul Eşiği
+
+#### 5.1. Modelin Amacı ve Görevi
+Modern SRE ve dağıtık sistem krizlerinde mühendislerin en sık yaptığı hata, zaman baskısı ve bilgi bombardımanı altında bilişsel aşırı yüklenme (cognitive overload) yaşayarak panik kararları (körlemesine rollback, yük testini atlama) vermeleridir.
+Bu modelin görevi: Oyuncunun kriz esnasındaki telemetrik davranışlarını (karar süresi, tıklama kararsızlığı, ipucu ihtiyacı, geçmiş hata geçmişi) izleyerek **bilişsel panik olasılığını** saniyenin binde birinde ($< 2\text{ms}$) tarayıcı içinde yerel olarak hesaplamaktır.
+
+#### 5.2. Model Mimarisi ve Formatı
+* **Model Tipi:** Tabular İkili Sınıflandırma (StandardScaler + LogisticRegression Pipeline).
+* **Format:** Open Neural Network Exchange (`model.onnx`), `target_opset=17`, zipmap devre dışı (düz tensör olasılıkları).
+* **Boyut:** $< 10\text{ KB}$ (ultra hafif, anında indirilebilir ve sıfır gecikmeli çıkarım).
+
+#### 5.3. Girdi Özellikleri (Feature Contract):
+1. `seviye_kod` (float32): Junior = 0.0, Senior = 1.0
+2. `karar_suresi_sn` (float32): Mevcut kararda geçen saniye ($0 - 60$)
+3. `secenek_degistirme_sayisi` (float32): Şıklar arasında geçiş/kararsızlık sayısı
+4. `ipucu_tiklama_sayisi` (float32): Sokratik mentora danışma adedi
+5. `onceki_asama_hatasi` (float32): Önceki aşamada patlama yaşandı mı? (0.0 = Başarılı, 1.0 = Hatalı)
+6. `sahne_no` (float32): Aktif aşama numarası ($1, 2, 3$)
+
+#### 5.4. Çıktı (Target):
+* `panik_durumu`:
+  - `0`: Normal / Kontrollü
+  - `1`: Bilişsel Aşırı Yüklenme / Panik Riski
+
+#### 5.5. Eğitimden Önce Tanımlanan Kabul Eşiği (Golden Standard Gate)
+Model eğitimi (`train.py`), aşağıdaki eşik değerlerini kesin bir kabul kapısı (eval gate) olarak uygular. Model bu eşikleri karşılayamazsa derleme başarısız olur ve model Hugging Face'e yayınlanmaz:
+
+| Metrik | Kabul Eşiği (Threshold) | Gerekçe |
+|---|:---:|---|
+| **ROC-AUC** | $\ge \mathbf{0.82}$ | Dengesiz kriz verilerinde pozitif/negatif ayırt etme gücünü garanti eder. |
+| **Accuracy (Doğruluk)** | $\ge \mathbf{0.80}$ | Yanlış panik alarmlarını önlemek için minimum %80 doğruluk zorunludur. |
+| **Maksimum ONNX-Sklearn Parite Farkı** | $\le \mathbf{10^{-4}}$ (`1e-4`) | Matematiksel parite ve sayısal taşınabilirlik garantisi. |
+
+---
+
+### 6. Durum Makinesi ve Akış Şeması (State Diagram)
 
 ```mermaid
 stateDiagram-v2
@@ -87,7 +137,21 @@ stateDiagram-v2
     }
 
     state DECISION_1 {
-        [*] --> ARCH_CHOICE: Mimari & Trafik Kararı
+        [*] --> TELEMETRY_STREAM: Canlı Davranış Telemetrisi (Süre, Kararsızlık, İpucu)
+        TELEMETRY_STREAM --> ONNX_INFERENCE: onnxruntime-web ile Yerel Çıkarım
+        
+        state ONNX_INFERENCE <<choice>>
+        ONNX_INFERENCE --> HIGH_PANIC: P(panik) >= 0.65 (Bilişsel Aşırı Yüklenme)
+        ONNX_INFERENCE --> CALM_MODE: P(panik) < 0.40 (Soğukkanlı Mühendis)
+        ONNX_INFERENCE --> NORMAL_FLOW: 0.40 <= P(panik) < 0.65
+
+        HIGH_PANIC --> PROACTIVE_MENTOR: Sokratik Danışman Otomatik Açılır + Süre Dondurulur
+        CALM_MODE --> DEEP_TELEMETRY: İleri Düzey P99 / Pool Metrikleri Açılır
+
+        PROACTIVE_MENTOR --> ARCH_CHOICE: Karara Yönel
+        DEEP_TELEMETRY --> ARCH_CHOICE: Karara Yönel
+        NORMAL_FLOW --> ARCH_CHOICE: Karara Yönel
+
         ARCH_CHOICE --> OPTION_1A: A) Tam Kapatma & Rollback
         ARCH_CHOICE --> OPTION_1B: B) Dinamik Kuyruk & Canlı Hotfix
     }

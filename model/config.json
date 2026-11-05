@@ -1,0 +1,61 @@
+{
+  "title": "SE Primer: Bilişsel Aşırı Yüklenme ve Panik Tahmini Modeli (COPP)",
+  "version": "2.0.0",
+  "description": "Oyuncunun karar süresi, tıklama kararsızlığı ve hata geçmişinden yararlanarak kriz anındaki panik/aşırı yüklenme olasılığını saniyenin binde birinde tahmin eden dikey ONNX modeli.",
+  "target": "panik_durumu",
+  "class_labels": {
+    "0": "Normal / Kontrollü",
+    "1": "Bilişsel Aşırı Yüklenme (Panik)"
+  },
+  "features": [
+    {
+      "name": "seviye_kod",
+      "type": "float32",
+      "example": 1.0
+    },
+    {
+      "name": "sahne_no",
+      "type": "float32",
+      "example": 1.0
+    },
+    {
+      "name": "karar_suresi_sn",
+      "type": "float32",
+      "example": 15.0
+    },
+    {
+      "name": "secenek_degistirme_sayisi",
+      "type": "float32",
+      "example": 0.0
+    },
+    {
+      "name": "ipucu_tiklama_sayisi",
+      "type": "float32",
+      "example": 0.0
+    },
+    {
+      "name": "onceki_asama_hatasi",
+      "type": "float32",
+      "example": 0.0
+    }
+  ],
+  "classes": [
+    "0",
+    "1"
+  ],
+  "metrics": {
+    "accuracy": 1.0,
+    "roc_auc": 1.0,
+    "f1_score": 1.0,
+    "precision": 1.0,
+    "recall": 1.0
+  },
+  "eval_gate_thresholds": {
+    "min_accuracy": 0.8,
+    "min_roc_auc": 0.82,
+    "max_parity_diff": 0.0001
+  },
+  "seed": 42,
+  "sklearn_version": "1.9.1",
+  "python_version": "3.13.0"
+}

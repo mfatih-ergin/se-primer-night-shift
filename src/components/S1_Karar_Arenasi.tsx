@@ -4,6 +4,7 @@ import { StageScenario, DecisionChoice, MetricState, EngineerProfile, DecisionRe
 import { TopologyDiagram } from './TopologyDiagram';
 import { SocraticTutorSheet } from './SocraticTutorSheet';
 import { soundEffects } from '../utils/audio';
+import { predictPanic, ModelPrediction } from '../utils/onnxInference';
 
 interface S1_Karar_ArenasiProps {
   stage: StageScenario;
@@ -28,11 +29,48 @@ export const S1_Karar_Arenasi: React.FC<S1_Karar_ArenasiProps> = ({
 }) => {
   const [selectedChoiceId, setSelectedChoiceId] = useState<'A' | 'B' | null>(null);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
+  const [switchCount, setSwitchCount] = useState(0);
+  const [hintCount, setHintCount] = useState(0);
+  const [stageSeconds, setStageSeconds] = useState(0);
+  const [prediction, setPrediction] = useState<ModelPrediction>({
+    probPanic: 0.1,
+    probCalm: 0.9,
+    predictedClass: 0,
+    statusText: 'Model Başlatılıyor...',
+  });
 
   // Sync state when stage changes
   useEffect(() => {
     setSelectedChoiceId(null);
+    setSwitchCount(0);
+    setHintCount(0);
+    setStageSeconds(0);
   }, [stage.stageNumber]);
+
+  // Track elapsed seconds in this decision stage
+  useEffect(() => {
+    if (isStageResolved) return;
+    const interval = setInterval(() => {
+      setStageSeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isStageResolved, stage.stageNumber]);
+
+  // ONNX Real-time inference
+  useEffect(() => {
+    if (isStageResolved) return;
+    const levelCode = profile.level === 'senior' ? 1.0 : 0.0;
+    const prevError = lastDecision && !lastDecision.choice.isRecommendedByBestPractice ? 1.0 : 0.0;
+
+    predictPanic([
+      levelCode,
+      stage.stageNumber,
+      stageSeconds,
+      switchCount,
+      hintCount,
+      prevError,
+    ]).then(setPrediction);
+  }, [stageSeconds, switchCount, hintCount, profile.level, stage.stageNumber, lastDecision, isStageResolved]);
 
   // Senior auto-trigger handler if time runs out
   useEffect(() => {
@@ -47,6 +85,9 @@ export const S1_Karar_Arenasi: React.FC<S1_Karar_ArenasiProps> = ({
   const handleCardClick = (choice: DecisionChoice) => {
     if (isStageResolved) return;
     soundEffects.playClick();
+    if (selectedChoiceId && selectedChoiceId !== choice.id) {
+      setSwitchCount((c) => c + 1);
+    }
     setSelectedChoiceId(choice.id);
     onSelectDecision(choice, false);
   };
@@ -87,6 +128,69 @@ export const S1_Karar_Arenasi: React.FC<S1_Karar_ArenasiProps> = ({
           <p className="leading-relaxed">{stage.technicalBriefing}</p>
         </div>
       </div>
+
+      {/* Adaptive ONNX Model Panic Telemetry Strip */}
+      <div
+        data-cy="ml-panic-badge"
+        className={`p-2.5 rounded-xl border flex items-center justify-between transition-all ${
+          prediction.probPanic >= 0.65
+            ? 'bg-[#EF4444]/15 border-[#EF4444] text-[#EF4444] glow-danger'
+            : prediction.probPanic < 0.4
+            ? 'bg-[#10B981]/15 border-[#10B981]/40 text-[#10B981]'
+            : 'bg-[#151D2F] border-[#24324F] text-[#DFE2F1]'
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <Cpu size={15} className={prediction.probPanic >= 0.65 ? 'text-[#EF4444]' : 'text-[#3B82F6]'} />
+          <div>
+            <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#94A3B8]">
+              ADAPTİF MODEL // BİLİŞSEL YÜKLENME TAHMİNİ
+            </div>
+            <div className="text-xs font-mono font-bold">
+              {prediction.statusText}
+            </div>
+          </div>
+        </div>
+        <div className="text-right font-mono">
+          <div className="text-[9px] text-[#94A3B8]">P(Panik)</div>
+          <div data-cy="ml-panic-prob" className="text-xs font-bold tabular-nums">
+            %{(prediction.probPanic * 100).toFixed(1)}
+          </div>
+        </div>
+      </div>
+
+      {/* Proactive Intervention Alert if probPanic >= 0.65 */}
+      {prediction.probPanic >= 0.65 && (
+        <div
+          data-cy="ml-alert-banner"
+          className="bg-[#EF4444]/20 border border-[#EF4444] rounded-xl p-3 flex items-center justify-between gap-2 shadow-lg animate-fadeIn"
+        >
+          <div className="flex items-start gap-2">
+            <AlertTriangle size={16} className="text-[#EF4444] shrink-0 mt-0.5" />
+            <div>
+              <div className="text-[10px] font-mono font-bold text-[#EF4444] uppercase">
+                PROAKTİF SOKRATİK MÜDAHALE // AŞIRI YÜKLENME
+              </div>
+              <p className="text-[11px] text-[#F9FAFB] leading-snug mt-0.5">
+                Model kriz altında yüksek tereddüt tespit etti. Karar vermeden önce ipucunu düşünün:
+              </p>
+              <p className="text-[10px] font-mono text-[#F59E0B] mt-1">
+                "{stage.suggestedQuestions[0]}"
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              soundEffects.playClick();
+              setHintCount((h) => h + 1);
+              setIsTutorOpen(true);
+            }}
+            className="shrink-0 px-2.5 py-1.5 rounded-lg bg-[#EF4444] hover:bg-[#DC2626] text-white text-[10px] font-mono font-bold transition-all cursor-pointer"
+          >
+            Danış
+          </button>
+        </div>
+      )}
 
       {/* Socratic Advice Callout Banner */}
       <div className="bg-[#151D2F] border-t-2 border-[#8B5CF6] border-x border-b border-[#24324F] rounded-xl p-3 flex items-center justify-between gap-2 shadow-sm">

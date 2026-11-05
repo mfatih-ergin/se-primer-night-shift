@@ -1,19 +1,111 @@
-# SE Primer — Night Shift: Season 5 Zero Hour
+# SE Primer — Night Shift: Season 5 Zero Hour (v2.0 Adaptif ONNX Sürümü)
 
-> **YZM301 - Yazılım Gerçekleme ve Test Dersi**  
-> Neal Stephenson'ın _The Diamond Age_ eserindeki _"A Young Lady's Illustrated Primer"_ konseptinden esinlenen, kişiselleştirilmiş interaktif yazılım mühendisliği kriz simülatörü.
+> **YZM301 - Yazılım Gerçekleme ve Test Dersi (Ödev 6 & 7)**  
+> Neal Stephenson'ın _The Diamond Age_ eserindeki _"A Young Lady's Illustrated Primer"_ konseptinden esinlenen; statik kurallar yerine **oyuncunun davranışsal telemetrisinden öğrenen, istemci tarafında koşan dikey bir ONNX makine öğrenmesi modeliyle (COPP)** kişiselleşen interaktif yazılım mühendisliği kriz simülatörü.
 
 ---
 
-## 📌 Proje Künyesi ve Öğrenci Bilgileri
+## 📌 Proje Künyesi ve Teslim Bağlantıları
 
 - **Adı Soyadı:** Muhammet Fatih ERGİN
 - **Öğrenci No:** 241478059
 - **E-Posta:** f.ergin162@gmail.com
 - **GitHub Deposu:** [https://github.com/mfatih-ergin/se-primer-night-shift](https://github.com/mfatih-ergin/se-primer-night-shift)
+- **Hugging Face Model Deposu (Commit'e Sabitlenmiş):** [https://huggingface.co/mfatih-ergin/se-primer-panic-onnx/resolve/9f8c12a7e4b/model.onnx](https://huggingface.co/mfatih-ergin/se-primer-panic-onnx)
 - **Google AI Studio Canlı Uygulama Linki:** [https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true](https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true)
 - **YouTube Demo & E2E Test Videosu:** [https://youtu.be/_5S39nzm7bA](https://youtu.be/_5S39nzm7bA)
 - **Cypress Yerel Demo Video Dosyası:** `cypress/videos/simulator.cy.js.mp4`
+
+---
+
+## ⚡ Hızlı Başlangıç (En Fazla 3 Komutla Çalıştırma)
+
+```bash
+# 1. Bağımlılıkları yükleyin (Node.js & Python)
+npm install && pip install scikit-learn onnx onnxruntime skl2onnx fastapi uvicorn
+
+# 2. Tekrarlanabilir model eğitimini ve Eval Kapısını (Gate) çalıştırın
+python train.py
+
+# 3. Diferansiyel parite testini ve Cypress E2E test süitini koşturun
+python tests/parite.py && node run-tests.js
+```
+
+---
+
+## 🧠 v2.0 Yeniliği: Bilişsel Aşırı Yüklenme & Panik Tahmini Modeli (COPP)
+
+v1.0 sürümündeki statik `if/else` kural motoru yerine; kullanıcının kriz esnasındaki mikro davranışlarını tarayıcı içinde yerel olarak izleyen dikey bir ONNX makine öğrenmesi modeli entegre edilmiştir:
+
+1. **Girdi Özellikleri (Telemetri Vektörü):**
+   - `seviye_kod` (Junior: 0, Senior: 1)
+   - `sahne_no` (1, 2, 3)
+   - `karar_suresi_sn` (Saniyeler cinsinden karar tereddüt süresi)
+   - `secenek_degistirme_sayisi` (A ve B kartları arasında gidip gelme sayısı)
+   - `ipucu_tiklama_sayisi` (Sokratik mentora danışma adedi)
+   - `onceki_asama_hatasi` (Önceki kararda patlama yaşandı mı?)
+2. **Çıktı & Adaptif Davranış:**
+   - Model tarayıcıda `onnxruntime-web` ile saniyenin binde birinde ($< 2\text{ms}$) çıkarım yapar.
+   - **$P(\text{panik}) \ge 0.65$:** `🧠 BİLİŞSEL AŞIRI YÜKLENME // PANİK` alarmı çalar. Sokratik Danışman otomatik olarak devreye girip zihni toparlayıcı mimari ipucunu açar ve süre sayacı dondurulur.
+   - **$P(\text{panik}) < 0.40$:** `🎯 SOĞUKKANLI MÜHENDİS` modu devreye girer; arayüz gürültüsü gizlenir ve derin dağıtık telemetri (P99, connection pool) görünür kılınır.
+
+---
+
+## 📊 Veri Seti Metodolojisi (`data/oturumlar.csv`)
+
+- **Gerçek Oturumlar:** 6 farklı katılımcıya 3'er aşama oynatılarak **18 gerçek oturum kararı** toplanmıştır (`kaynak: "gercek"`).
+- **Sentetik Veri Üretimi:** `SEED = 42` tohumuyla kriz dinamiklerine uygun 102 sentetik karar satırı üretilmiştir (`kaynak: "sentetik"`). Toplam 120 satır.
+- **Sentetik Üretici Kuralı:** Karar süresi $> 38\text{sn}$, kararsızlık $\ge 2$ ve önceki hata $= 1$ olan profillerde panik olasılığı %88; hızlı kararlarda (%8) olacak şekilde modellenmiştir.
+- **KVKK Uyumu:** Kişisel hiçbir veri (ad, e-posta, IP vb.) toplanmamış; rastgele `sess_...` kimlikleri kullanılmıştır.
+- **Veri Sözlüğü:** [`data/SOZLUK.md`](data/SOZLUK.md) dosyasında tüm değişkenler tanımlanmıştır.
+
+---
+
+## 🔬 Somut Artefaktlar ve Diferansiyel Test (Parite Testi)
+
+Sommerville Bölüm 8 (V&V) ilkesi gereğince sistemde iki bağımsız tüketici bulunmaktadır:
+1. **İstemci Tüketicisi:** Tarayıcıda `onnxruntime-web` ile çalışan web uygulaması.
+2. **Test Kahini (Oracle):** `model.onnx` dosyasını bağımsız çalıştıran Python betiği (`tests/parite.py`).
+
+- **Diferansiyel Test:** [`tests/parite.json`](tests/parite.json) içindeki 5 referans girdi üzerinde Python Oracle çıktısı ile tarayıcı ONNX çıktısı kıyaslanır.
+- **Hata Toleransı:** Mutlak fark $|\Delta| \le 10^{-4}$ (`1e-4`) olmak zorundadır. Yapılan testlerde maksimum sapma **$9.91 \times 10^{-8}$** olarak doğrulanmış ve tüm testler geçmiştir.
+- **Sunucu API (Bonus +10):** [`api_server.py`](api_server.py) FastAPI mikroservisi ile aynı referans çıktıyı sunucu tarafında da sunmaktadır.
+
+---
+
+## 🚀 Güvenli Dağıtım ve Mimari Ödünleşimler (`RELEASE.md`)
+
+- **Geri Alma (Rollback):** Modelde sapma görülürse `USE_ML_INFERENCE: false` bayrağıyla anında v1.0 deterministik kural motoruna dönülür.
+- **Dağıtım Stratejisi:** Gölge Dağıtım (Shadow) $\rightarrow$ Kanarya Dağıtımı (%5) $\rightarrow$ Aşamalı Geçiş (%25 $\rightarrow$ %50 $\rightarrow$ %100).
+- **Ödünleşim Matrisi:** Tarayıcı içi çıkarım, mobil cihaz içi gömülü ve bulut sunucu mimarilerinin gecikme, KVKK ve model gizliliği açısından detaylı kıyaslaması [`RELEASE.md`](RELEASE.md) dosyasında sunulmuştur.
+
+---
+
+## 📝 Vize Sınavı Tasarımı Düşünce Egzersizi (`SINAV_TASARIMI.md`)
+
+Neal Stephenson'ın uyarlamalı Primer vizyonundan hareketle, ezberi değil kavramların gerçek özünü ve mühendislik gerekçesini ölçen özgün klasik sınav sorusu ve çeldirici analizleri [`SINAV_TASARIMI.md`](SINAV_TASARIMI.md) dosyasında 1 sayfa olarak belgelenmiştir.
+
+---
+
+## 🤖 Coding Agent Yönetim Beyanı
+
+Bu ödev sürecinde yapay zekâ kodlama ajanı (Antigravity / Gemini) bir pair-programming ortağı olarak kullanılmış; süreci yöneten mühendis olarak aşağıdaki müdahaleler bizzat gerçekleştirilmiştir:
+1. **Model Hedefinin Belirlenmesi:** Ajanın önerdiği standart hazır örnekler yerine, Season 5 kriz temasına özgü "Bilişsel Aşırı Yüklenme ve Panik Tahmini" senaryosu seçilmiş ve girdi vektörü mimarisi tasarlanmıştır.
+2. **Windows Konsol Kodlama Hataları:** Python 3.13 ortamında Windows CP1254 karakter kodlaması kaynaklı terminal çöküşleri tespit edilmiş ve `sys.stdout.reconfigure(encoding='utf-8')` ile elle düzeltilmiştir.
+3. **JSX Aritmetik Kaçış Hatası:** `ParityTestModal.tsx` bileşeninde matematiksel KaTeX ifadesinin JSX derleyicisi tarafından nesne sanılarak patlatılması elle yakalanmış ve sözdizimi onarılmıştır.
+4. **Cypress E2E Entegrasyonu:** Standart test süitine ek olarak, hem arayüz üzerinden hem de arka planda çalışan WebAssembly parite testini (`data-cy="parity-modal"`) denetleyen uçtan uca senaryolar kurgulanmıştır.
+
+---
+
+## 📚 Akademik ve Teknik Referanslar
+
+1. **Amershi, S. vd. (2019):** *Software Engineering for Machine Learning: A Case Study*, Microsoft SE Case Studies.
+2. **Shankar, S. vd. (2022):** *Operationalizing Machine Learning: An Interview Study* (ML Mühendisliğinde 3V: Velocity, Validation, Versioning).
+3. **Mitchell, M. vd. (2019):** *Model Cards for Model Reporting*, FAT* '19.
+4. **Sommerville, I.:** *Software Engineering (10. Baskı)* — Bl. 8 Yazılım Testi (Doğrulama ve Geçerleme / V&V).
+5. **Stanford HAI (2025):** *Artificial Intelligence Index Report* (Çıkarım maliyetlerindeki 300x düşüş trendi).
+6. **Gartner (2025):** *Küçük Göreve Özel (Dikey) Modeller 2027 Öngörüsü*.
+
 
 ---
 

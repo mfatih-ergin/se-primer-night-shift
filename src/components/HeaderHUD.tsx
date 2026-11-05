@@ -11,6 +11,7 @@ interface HeaderHUDProps {
   isMuted: boolean;
   onToggleMute: () => void;
   onOpenTutor?: () => void;
+  onOpenParityModal?: () => void;
 }
 
 export const HeaderHUD: React.FC<HeaderHUDProps> = ({
@@ -21,6 +22,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
   remainingSeconds,
   isMuted,
   onToggleMute,
+  onOpenParityModal,
 }) => {
   const isCriticalHealth = metrics.systemHealth < 40;
   const isNominalHealth = metrics.systemHealth >= 75;
@@ -51,8 +53,19 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
           </div>
         </div>
 
-        {/* Center / Right: Countdown Timer (Senior) or Guidance Badge (Junior) */}
+        {/* Center / Right: Parity Modal, Timer, Sound */}
         <div className="flex items-center gap-2">
+          {onOpenParityModal && (
+            <button
+              data-cy="open-parity-modal"
+              onClick={onOpenParityModal}
+              className="px-2 py-1 rounded bg-[#3B82F6]/15 hover:bg-[#3B82F6]/30 border border-[#3B82F6]/40 text-[#3B82F6] text-[10px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1"
+              title="Diferansiyel Test Kahini (Oracle) Parite Paneli"
+            >
+              <span>🔬 PARİTE TESTİ</span>
+            </button>
+          )}
+
           {level === 'senior' ? (
             <div
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded border font-mono text-xs font-semibold tabular-nums ${

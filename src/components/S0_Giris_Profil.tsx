@@ -7,12 +7,14 @@ interface S0_Giris_ProfilProps {
   profile: EngineerProfile;
   onChangeProfile: (profile: EngineerProfile) => void;
   onStartSimulation: () => void;
+  onOpenParityModal?: () => void;
 }
 
 export const S0_Giris_Profil: React.FC<S0_Giris_ProfilProps> = ({
   profile,
   onChangeProfile,
   onStartSimulation,
+  onOpenParityModal,
 }) => {
   const handleSelectLevel = (level: EngineerLevel) => {
     soundEffects.playClick();
@@ -46,9 +48,23 @@ export const S0_Giris_Profil: React.FC<S0_Giris_ProfilProps> = ({
 
         {/* Title */}
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EF4444]/15 border border-[#EF4444]/40 text-[#EF4444] text-[10px] font-mono font-bold tracking-wider mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] animate-ping" />
-            ZERO HOUR INCIDENT
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EF4444]/15 border border-[#EF4444]/40 text-[#EF4444] text-[10px] font-mono font-bold tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] animate-ping" />
+              <span>ZERO HOUR INCIDENT</span>
+            </div>
+
+            {onOpenParityModal && (
+              <button
+                type="button"
+                data-cy="open-parity-modal-welcome"
+                onClick={onOpenParityModal}
+                className="px-2 py-0.5 rounded-lg bg-[#3B82F6]/15 hover:bg-[#3B82F6]/30 border border-[#3B82F6]/40 text-[#3B82F6] text-[10px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1"
+                title="Diferansiyel Test Kahini (Oracle) Parite Paneli"
+              >
+                <span>🔬 PARİTE TESTİ</span>
+              </button>
+            )}
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-[#F9FAFB] leading-tight">
             SE Primer: Night Shift

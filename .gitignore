@@ -2,6 +2,8 @@ node_modules/
 dist/
 bun.lock
 cypress/screenshots/
+__pycache__/
+*.pyc
 .DS_Store
 Thumbs.db
 .env

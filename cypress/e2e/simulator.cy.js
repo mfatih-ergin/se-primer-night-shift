@@ -105,4 +105,35 @@ describe('SE Primer — Night Shift: Season 5 Zero Hour E2E Test Suite (AI Studi
     cy.contains('SE Primer: Night Shift').should('be.visible');
     cy.contains('ZERO HOUR INCIDENT').should('be.visible');
   });
+
+  it('6. Diferansiyel Test (Parite Testi): Python Oracle vs Tarayıcı ONNX Paritesini (< 1e-4) Doğrular', () => {
+    // Karşılama ekranındaki Parite Testi modalını aç
+    cy.get('[data-cy="open-parity-modal-welcome"]').click();
+    cy.get('[data-cy="parity-modal"]').should('be.visible');
+
+    // Durum şeridinin 'PARİTE TAM' olduğunu doğrula
+    cy.get('[data-cy="parity-status"]', { timeout: 8000 }).should('contain.text', 'PARİTE TAM');
+
+    // 5 kanonik vakanın hepsinin GEÇTİ (PASS) olduğunu kontrol et
+    cy.get('[data-cy="parity-case-1"]').should('contain.text', 'GEÇTİ (PASS)');
+    cy.get('[data-cy="parity-case-2"]').should('contain.text', 'GEÇTİ (PASS)');
+    cy.get('[data-cy="parity-case-3"]').should('contain.text', 'GEÇTİ (PASS)');
+    cy.get('[data-cy="parity-case-4"]').should('contain.text', 'GEÇTİ (PASS)');
+    cy.get('[data-cy="parity-case-5"]').should('contain.text', 'GEÇTİ (PASS)');
+
+    // Modal kapatma
+    cy.contains('Kapat').click();
+    cy.get('[data-cy="parity-modal"]').should('not.exist');
+  });
+
+  it('7. Adaptif ONNX Model Çıkarımı: Karar Arenasında Gerçek Zamanlı Panik Olasılığını Gösterir', () => {
+    cy.contains("Primer'ı Başlat — Nöbeti Devral").click();
+
+    // Adaptif model rozetinin görünür olduğunu doğrula
+    cy.get('[data-cy="ml-panic-badge"]').should('be.visible');
+    cy.contains('ADAPTİF MODEL').should('be.visible');
+
+    // Panik olasılığı yüzdesinin render edildiğini doğrula
+    cy.get('[data-cy="ml-panic-prob"]').should('be.visible').and('contain.text', '%');
+  });
 });
