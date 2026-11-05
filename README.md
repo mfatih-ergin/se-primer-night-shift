@@ -15,9 +15,9 @@
 - **Canlı Web Uygulama Linki (GitHub Pages & AI Studio):**
   - [GitHub Pages Canlı Uygulama](https://mfatih-ergin.github.io/se-primer-night-shift/)
   - [Google AI Studio Canlı Uygulama](https://ai.studio/apps/ed7624a7-bad7-42e3-afdd-106f4167fd0c?fullscreenApplet=true)
-- **YouTube Demo Videosu:** [https://youtu.be/_5S39nzm7bA](https://youtu.be/_5S39nzm7bA)
-- **83 Saniyelik Adaptif Model Demo Videosu (Yerel Dosya):** `cypress/videos/demo_video.cy.js.mp4`
-- **7/7 E2E ve Diferansiyel Parite Test Videosu:** `cypress/videos/simulator.cy.js.mp4`
+- **YouTube Demo Videosu (83s - İki Farklı Oyuncu & Parite):** [https://youtu.be/urUfZvOgdrI](https://youtu.be/urUfZvOgdrI)
+- **E2E Regresyon Test Videosu (Cypress):** [https://youtu.be/_5S39nzm7bA](https://youtu.be/_5S39nzm7bA)
+- **Yerel Demo Video Dosyası:** `cypress/videos/demo_video.cy.js.mp4`
 
 ---
 
